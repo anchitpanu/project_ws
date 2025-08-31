@@ -1,0 +1,100 @@
+[0.000000] (-) TimerEvent: {}
+[0.000587] (quin_core) JobQueued: {'identifier': 'quin_core', 'dependencies': OrderedDict()}
+[0.000952] (quin_core) JobStarted: {'identifier': 'quin_core'}
+[0.011256] (quin_core) JobProgress: {'identifier': 'quin_core', 'progress': 'cmake'}
+[0.012329] (quin_core) JobProgress: {'identifier': 'quin_core', 'progress': 'build'}
+[0.013299] (quin_core) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/quin/project_ws/quin_ws/build/quin_core', '--', '-j4', '-l4'], 'cwd': '/home/quin/project_ws/quin_ws/build/quin_core', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'quin', 'SSH_CLIENT': '10.21.50.120 33658 22', 'LC_TIME': 'C.UTF-8', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/quin/microros_ws/install/micro_ros_agent/lib:/home/quin/microros_ws/install/micro_ros_msgs/lib:/home/quin/microros_ws/install/drive_base_msgs/lib:/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/lib', 'HOME': '/home/quin', 'OLDPWD': '/home/quin/project_ws/quin_ws/src/quin_core/scripts', 'SSH_TTY': '/dev/pts/0', 'ROS_PYTHON_VERSION': '3', 'LC_MONETARY': 'C.UTF-8', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLCON_PREFIX_PATH': '/home/quin/project_ws/quin_ws/install:/home/quin/microros_ws/install:/home/quin/quin_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'quin', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '1', 'PATH': '/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'LC_ADDRESS': 'C.UTF-8', 'XDG_RUNTIME_DIR': '/run/user/1000', 'LANG': 'C.UTF-8', 'LC_TELEPHONE': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/home/quin/project_ws/quin_ws/install/quin_core:/home/quin/quin_ws/install:/home/quin/microros_ws/install/micro_ros_setup:/home/quin/microros_ws/install/micro_ros_agent:/home/quin/microros_ws/install/micro_ros_msgs:/home/quin/microros_ws/install/drive_base_msgs:/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LC_NAME': 'C.UTF-8', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'LC_MEASUREMENT': 'C.UTF-8', 'LC_IDENTIFICATION': 'C.UTF-8', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/home/quin/project_ws/quin_ws/build/quin_core', 'LC_ALL': 'C.UTF-8', 'SSH_CONNECTION': '10.21.50.120 33658 10.21.50.237 22', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages:/home/quin/quin_ws/build/quin_core:/home/quin/quin_ws/install/lib/python3.12/site-packages:/home/quin/microros_ws/install/micro_ros_msgs/lib/python3.12/site-packages:/home/quin/microros_ws/install/drive_base_msgs/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'LC_NUMERIC': 'C.UTF-8', 'LC_PAPER': 'C.UTF-8', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/home/quin/project_ws/quin_ws/install/quin_core:/home/quin/microros_ws/install/micro_ros_setup:/home/quin/microros_ws/install/micro_ros_agent:/home/quin/microros_ws/install/micro_ros_msgs:/home/quin/microros_ws/install/drive_base_msgs:/home/quin/quin_ws/install:/opt/ros/jazzy'}), 'shell': False}
+[0.061930] (quin_core) StdoutLine: {'line': b'-- Found ament_cmake: 2.5.4 (/opt/ros/jazzy/share/ament_cmake/cmake)\n'}
+[0.099609] (-) TimerEvent: {}
+[0.200049] (-) TimerEvent: {}
+[0.300437] (-) TimerEvent: {}
+[0.400793] (-) TimerEvent: {}
+[0.406908] (quin_core) StdoutLine: {'line': b'-- Found tf2: 0.36.12 (/opt/ros/jazzy/share/tf2/cmake)\n'}
+[0.439986] (quin_core) StdoutLine: {'line': b'-- Found rosidl_generator_c: 4.6.5 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)\n'}
+[0.453193] (quin_core) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 4.6.5 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)\n'}
+[0.469517] (quin_core) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.488946] (quin_core) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.500877] (-) TimerEvent: {}
+[0.547780] (quin_core) StdoutLine: {'line': b'-- Found rclpy: 7.1.4 (/opt/ros/jazzy/share/rclpy/cmake)\n'}
+[0.548119] (quin_core) StdoutLine: {'line': b'-- Found rclcpp: 28.1.10 (/opt/ros/jazzy/share/rclcpp/cmake)\n'}
+[0.600992] (-) TimerEvent: {}
+[0.616617] (quin_core) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 7.3.2 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)\n'}
+[0.618723] (quin_core) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 8.4.2 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)\n'}
+[0.701098] (-) TimerEvent: {}
+[0.711314] (quin_core) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[0.801212] (-) TimerEvent: {}
+[0.801561] (quin_core) StdoutLine: {'line': b'-- Found cv_bridge: 4.1.0 (/opt/ros/jazzy/share/cv_bridge/cmake)\n'}
+[0.838007] (quin_core) StdoutLine: {'line': b'-- Found rclcpp_action: 28.1.10 (/opt/ros/jazzy/share/rclcpp_action/cmake)\n'}
+[0.890058] (quin_core) StdoutLine: {'line': b'-- Found tf2_geometry_msgs: 0.36.12 (/opt/ros/jazzy/share/tf2_geometry_msgs/cmake)\n'}
+[0.895009] (quin_core) StdoutLine: {'line': b'-- Found eigen3_cmake_module: 0.3.0 (/opt/ros/jazzy/share/eigen3_cmake_module/cmake)\n'}
+[0.897032] (quin_core) StdoutLine: {'line': b'-- Ensuring Eigen3 include directory is part of orocos-kdl CMake target\n'}
+[0.901286] (-) TimerEvent: {}
+[1.001570] (-) TimerEvent: {}
+[1.101921] (-) TimerEvent: {}
+[1.133746] (quin_core) StdoutLine: {'line': b'-- Found ament_lint_auto: 0.17.2 (/opt/ros/jazzy/share/ament_lint_auto/cmake)\n'}
+[1.202016] (-) TimerEvent: {}
+[1.290291] (quin_core) StdoutLine: {'line': b'-- Configuring done (1.2s)\n'}
+[1.302121] (-) TimerEvent: {}
+[1.304566] (quin_core) StdoutLine: {'line': b'-- Generating done (0.0s)\n'}
+[1.316260] (quin_core) StdoutLine: {'line': b'-- Build files have been written to: /home/quin/project_ws/quin_ws/build/quin_core\n'}
+[1.397135] (quin_core) StdoutLine: {'line': b'Built target ament_cmake_python_copy_quin_core\n'}
+[1.402239] (-) TimerEvent: {}
+[1.502590] (-) TimerEvent: {}
+[1.602929] (-) TimerEvent: {}
+[1.681481] (quin_core) StdoutLine: {'line': b'running egg_info\n'}
+[1.703014] (-) TimerEvent: {}
+[1.704965] (quin_core) StdoutLine: {'line': b'writing quin_core.egg-info/PKG-INFO\n'}
+[1.705362] (quin_core) StdoutLine: {'line': b'writing dependency_links to quin_core.egg-info/dependency_links.txt\n'}
+[1.710486] (quin_core) StdoutLine: {'line': b'writing top-level names to quin_core.egg-info/top_level.txt\n'}
+[1.778524] (quin_core) StdoutLine: {'line': b"reading manifest file 'quin_core.egg-info/SOURCES.txt'\n"}
+[1.779260] (quin_core) StdoutLine: {'line': b"writing manifest file 'quin_core.egg-info/SOURCES.txt'\n"}
+[1.803127] (-) TimerEvent: {}
+[1.845725] (quin_core) StdoutLine: {'line': b'Built target ament_cmake_python_build_quin_core_egg\n'}
+[1.865090] (quin_core) CommandEnded: {'returncode': 0}
+[1.865950] (quin_core) JobProgress: {'identifier': 'quin_core', 'progress': 'install'}
+[1.882943] (quin_core) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/quin/project_ws/quin_ws/build/quin_core'], 'cwd': '/home/quin/project_ws/quin_ws/build/quin_core', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'quin', 'SSH_CLIENT': '10.21.50.120 33658 22', 'LC_TIME': 'C.UTF-8', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/quin/microros_ws/install/micro_ros_agent/lib:/home/quin/microros_ws/install/micro_ros_msgs/lib:/home/quin/microros_ws/install/drive_base_msgs/lib:/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/lib', 'HOME': '/home/quin', 'OLDPWD': '/home/quin/project_ws/quin_ws/src/quin_core/scripts', 'SSH_TTY': '/dev/pts/0', 'ROS_PYTHON_VERSION': '3', 'LC_MONETARY': 'C.UTF-8', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLCON_PREFIX_PATH': '/home/quin/project_ws/quin_ws/install:/home/quin/microros_ws/install:/home/quin/quin_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'quin', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '1', 'PATH': '/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'LC_ADDRESS': 'C.UTF-8', 'XDG_RUNTIME_DIR': '/run/user/1000', 'LANG': 'C.UTF-8', 'LC_TELEPHONE': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/home/quin/project_ws/quin_ws/install/quin_core:/home/quin/quin_ws/install:/home/quin/microros_ws/install/micro_ros_setup:/home/quin/microros_ws/install/micro_ros_agent:/home/quin/microros_ws/install/micro_ros_msgs:/home/quin/microros_ws/install/drive_base_msgs:/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LC_NAME': 'C.UTF-8', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'LC_MEASUREMENT': 'C.UTF-8', 'LC_IDENTIFICATION': 'C.UTF-8', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/home/quin/project_ws/quin_ws/build/quin_core', 'LC_ALL': 'C.UTF-8', 'SSH_CONNECTION': '10.21.50.120 33658 10.21.50.237 22', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages:/home/quin/quin_ws/build/quin_core:/home/quin/quin_ws/install/lib/python3.12/site-packages:/home/quin/microros_ws/install/micro_ros_msgs/lib/python3.12/site-packages:/home/quin/microros_ws/install/drive_base_msgs/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'LC_NUMERIC': 'C.UTF-8', 'LC_PAPER': 'C.UTF-8', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/home/quin/project_ws/quin_ws/install/quin_core:/home/quin/microros_ws/install/micro_ros_setup:/home/quin/microros_ws/install/micro_ros_agent:/home/quin/microros_ws/install/micro_ros_msgs:/home/quin/microros_ws/install/drive_base_msgs:/home/quin/quin_ws/install:/opt/ros/jazzy'}), 'shell': False}
+[1.896322] (quin_core) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[1.896688] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/launch\n'}
+[1.896822] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/launch/joystickController.launch.py\n'}
+[1.896955] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/launch/microros.launch.py\n'}
+[1.897061] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/launch/bot_bringup.launch.py\n'}
+[1.897166] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/scripts\n'}
+[1.897269] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/cmd_move.py\n'}
+[1.897367] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/joystick_control\n'}
+[1.897575] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/joystick_control.py\n'}
+[1.897704] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/config\n'}
+[1.897854] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/config/locations.yaml\n'}
+[1.897970] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/config/motor_config.yaml\n'}
+[1.898074] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/pythonpath.sh\n'}
+[1.898193] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/pythonpath.dsv\n'}
+[1.898296] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info\n'}
+[1.898393] (quin_core) StdoutLine: {'line': b'-- Installing: /home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/SOURCES.txt\n'}
+[1.898491] (quin_core) StdoutLine: {'line': b'-- Installing: /home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/top_level.txt\n'}
+[1.898587] (quin_core) StdoutLine: {'line': b'-- Installing: /home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/PKG-INFO\n'}
+[1.898682] (quin_core) StdoutLine: {'line': b'-- Installing: /home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/dependency_links.txt\n'}
+[1.898792] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core\n'}
+[1.899012] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core/__init__.py\n'}
+[1.903246] (-) TimerEvent: {}
+[1.949039] (quin_core) StdoutLine: {'line': b"Listing '/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core'...\n"}
+[1.960563] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/lib/quin_core/joystick_control\n'}
+[1.960959] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/lib/quin_core/cmd_move.py\n'}
+[1.961178] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/lib/quin_core/src/controller.py\n'}
+[1.961275] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/lib/quin_core/src/utilize.py\n'}
+[1.961367] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/ament_index/resource_index/package_run_dependencies/quin_core\n'}
+[1.961455] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/ament_index/resource_index/parent_prefix_path/quin_core\n'}
+[1.961540] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/ament_prefix_path.sh\n'}
+[1.961673] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/ament_prefix_path.dsv\n'}
+[1.961770] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/path.sh\n'}
+[1.961880] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/path.dsv\n'}
+[1.961989] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.bash\n'}
+[1.962076] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.sh\n'}
+[1.962157] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.zsh\n'}
+[1.962239] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.dsv\n'}
+[1.962319] (quin_core) StdoutLine: {'line': b'-- Installing: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/package.dsv\n'}
+[1.962406] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/ament_index/resource_index/packages/quin_core\n'}
+[1.962489] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/cmake/quin_coreConfig.cmake\n'}
+[1.962571] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/cmake/quin_coreConfig-version.cmake\n'}
+[1.962654] (quin_core) StdoutLine: {'line': b'-- Up-to-date: /home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/package.xml\n'}
+[1.964625] (quin_core) CommandEnded: {'returncode': 0}
+[1.996899] (quin_core) JobEnded: {'identifier': 'quin_core', 'rc': 0}
+[1.997907] (-) EventReactorShutdown: {}

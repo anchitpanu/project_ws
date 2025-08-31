@@ -1,0 +1,11 @@
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/uninstall.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/quin_core_uninstall.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/ament_cmake_python_copy_quin_core.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/ament_cmake_python_build_quin_core_egg.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/test.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/edit_cache.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/rebuild_cache.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/list_install_components.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/install.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/install/local.dir
+/home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/install/strip.dir

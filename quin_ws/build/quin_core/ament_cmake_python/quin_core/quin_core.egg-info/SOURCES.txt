@@ -1,0 +1,6 @@
+setup.py
+quin_core/__init__.py
+quin_core.egg-info/PKG-INFO
+quin_core.egg-info/SOURCES.txt
+quin_core.egg-info/dependency_links.txt
+quin_core.egg-info/top_level.txt

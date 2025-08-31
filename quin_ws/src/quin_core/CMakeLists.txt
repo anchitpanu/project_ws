@@ -62,7 +62,7 @@ install(PROGRAMS
   # scripts/apriltag_distance.py
   # scripts/both_detect.py
   
-  scripts/joystick_control.py
+  scripts/joystick_control
   scripts/cmd_move.py
 
   #scripts_camera/cameracapture.py
@@ -78,7 +78,8 @@ install(PROGRAMS
 install(PROGRAMS
   src/controller.py
   src/utilize.py
-  DESTINATION lib/${PROJECT_NAME}/sr
+  DESTINATION lib/${PROJECT_NAME}/src
+)
 ##############################################################################
 # TensorFlow Lite
 ################################################################################
@@ -93,17 +94,17 @@ link_directories(/usr/local/lib)
 # Install C++ Programs
 ################################################################################
 
-add_executable(apriltag_auto_aim scripts_camera/apriltag_auto_aim.cpp)
+# add_executable(apriltag_auto_aim scripts_camera/apriltag_auto_aim.cpp)
 # add_executable(hoop_detection_onnx scripts_camera/hoop_detection_onnx.cpp)
 # add_executable(hoop_detection_tflite scripts_camera/hoop_detection_tflite.cpp)
 
-ament_target_dependencies(apriltag_auto_aim 
-  rclcpp
-  sensor_msgs 
-  geometry_msgs 
-  cv_bridge
-  OpenCV
-)
+# ament_target_dependencies(apriltag_auto_aim 
+#   rclcpp
+#   sensor_msgs 
+#   geometry_msgs 
+#   cv_bridge
+#   OpenCV
+# )
 
 # ament_target_dependencies(hoop_detection_onnx
 #   rclcpp
@@ -130,7 +131,7 @@ ament_target_dependencies(apriltag_auto_aim
 #     ${PROJECT_SOURCE_DIR}/include  # your own headers if any
 # )
 
-target_link_libraries(apriltag_auto_aim ${OpenCV_LIBS} apriltag)
+# target_link_libraries(apriltag_auto_aim ${OpenCV_LIBS} apriltag)
 # target_link_libraries(hoop_detection_onnx ${OpenCV_LIBS} onnxruntime)
 
 # target_link_libraries(hoop_detection_tflite
@@ -139,20 +140,20 @@ target_link_libraries(apriltag_auto_aim ${OpenCV_LIBS} apriltag)
 # )
 
 
-install(TARGETS
-  apriltag_auto_aim
-#   hoop_detection_onnx
-#   hoop_detection_tflite
-  DESTINATION lib/${PROJECT_NAME}
-)
+# install(TARGETS
+#   apriltag_auto_aim
+# #   hoop_detection_onnx
+# #   hoop_detection_tflite
+#   DESTINATION lib/${PROJECT_NAME}
+# )
 
 ################################################################################
 # Install Picture Model
 ################################################################################
-install(DIRECTORY 
-  models/
-  DESTINATION share/${PROJECT_NAME}/models
-)
+# install(DIRECTORY 
+#   models/
+#   DESTINATION share/${PROJECT_NAME}/models
+# )
 
 ################################################################################
 
