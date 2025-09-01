@@ -4,8 +4,8 @@
 /*
 ROBOT ORIENTATION
          FRONT
-    MOTOR1  MOTOR2  (2WD/ACKERMANN)
-    MOTOR3  MOTOR4  (4WD/MECANUM)
+    MOTOR1  MOTOR3  
+    MOTOR2  MOTOR4  (4WD/DIFFERENTIAL)
          BACK
 */
 
@@ -32,8 +32,8 @@ ROBOT ORIENTATION
 #define COUNTS_PER_REV2 ENCODER1_PULSES_PER_REVOLUTION * ENCODER_TICKS  // wheel2 encoder's no of ticks per rev
 #define COUNTS_PER_REV3 ENCODER1_PULSES_PER_REVOLUTION * ENCODER_TICKS  // wheel3 encoder's no of ticks per rev
 #define COUNTS_PER_REV4 ENCODER1_PULSES_PER_REVOLUTION * ENCODER_TICKS  // wheel4 encoder's no of ticks per rev
-#define WHEEL_DIAMETER 0.05                                             // wheel's diameter in meters
-#define LR_WHEELS_DISTANCE 0.335                                        // distance between left and right wheels
+#define WHEEL_DIAMETER 0.085                                            // wheel's diameter in meters
+#define LR_WHEELS_DISTANCE 0.375                                        // distance between left and right wheels
 #define PWM_BITS 10                                                     // PWM Resolution of the microcontroller
 #define PWM_FREQUENCY 20000                                             // PWM Frequency
 #define PWM_Max pow(2, PWM_BITS) - 1

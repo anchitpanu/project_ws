@@ -4,8 +4,8 @@
 /*
 ROBOT ORIENTATION
          FRONT
-    MOTOR1  MOTOR2  (2WD/ACKERMANN)
-    MOTOR3  MOTOR4  (4WD/MECANUM)
+    MOTOR1  MOTOR3  
+    MOTOR2  MOTOR4  (4WD/DIFFERENTIAL)
          BACK
 */
 
@@ -14,8 +14,8 @@ ROBOT ORIENTATION
 
 // INVERT MOTOR DIRECTIONS
 #define MOTOR1_INV true
-#define MOTOR2_INV false
-#define MOTOR3_INV true
+#define MOTOR2_INV true
+#define MOTOR3_INV false
 #define MOTOR4_INV false
 
 #define MOTOR1_BREAK true
@@ -23,20 +23,20 @@ ROBOT ORIENTATION
 #define MOTOR3_BREAK true
 #define MOTOR4_BREAK true
 
-#define MOTOR1_PWM 32
-#define MOTOR1_IN_A 33
-#define MOTOR1_IN_B 25
+// #define MOTOR1_PWM 32
+#define MOTOR1_IN_A 32
+#define MOTOR1_IN_B 33
 
-#define MOTOR2_PWM 19
-#define MOTOR2_IN_A 18 
-#define MOTOR2_IN_B 5
+// #define MOTOR2_PWM 19
+#define MOTOR2_IN_A 34 
+#define MOTOR2_IN_B 35
 
-#define MOTOR3_PWM 26
-#define MOTOR3_IN_A 27
-#define MOTOR3_IN_B 14
+// #define MOTOR3_PWM 26
+#define MOTOR3_IN_A 16
+#define MOTOR3_IN_B 17
 
-#define MOTOR4_PWM 17
-#define MOTOR4_IN_A 16
-#define MOTOR4_IN_B 4
+// #define MOTOR4_PWM 17
+#define MOTOR4_IN_A 22
+#define MOTOR4_IN_B 23
 
 #endif
