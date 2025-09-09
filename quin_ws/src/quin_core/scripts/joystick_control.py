@@ -61,6 +61,15 @@ class Gamepad:
                 self.last_macro_button = None
         self.previous_triangle_state = self.button_triangle
 
+    def update_roulette(self):
+        if self.button_circle and not self.previous_circle_state:
+            self.roulette = not self.roulette
+            if self.roulette:
+                self.last_macro_button = 'roulette'
+            else:
+                self.last_macro_button = None
+        self.previous_circle_state = self.button_circle
+
     def update_toggle_encoder(self):
         if self.PressedRightAnalog and not self.previous_PressedRightAnalog_state:
             self.toggle_encoder_bool = not self.toggle_encoder_bool
@@ -133,6 +142,7 @@ class Joystick(Node):
         #Macro-----------------------------------------------------------
         
         self.gamepad.update_drill()
+        self.gamepad.update_roulette()
         self.gamepad.update_toggle_encoder()
     
         
@@ -157,6 +167,9 @@ class Joystick(Node):
 
         if self.gamepad.last_macro_button == 'drill' and self.gamepad.drill:
             cmd_vel_macro.linear.x = 1.0
+
+        if self.gamepad.last_macro_button == 'roulette' and self.gamepad.roulette:
+            cmd_vel_macro.linear.y = 1.0
 
         if self.gamepad.toggle_encoder_bool:
             cmd_encoder.linear.x = 2.0 #RPM
