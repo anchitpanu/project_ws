@@ -52,7 +52,7 @@
 
 //------------------------------ < Define > -------------------------------------//
 
-#define WHEEL_BASE 0.335                   // distance between right and left wheels
+#define LR_WHEELS_DISTANCE 0.375                   // distance between right and left wheels
 
 rcl_publisher_t debug_motor_publisher;
 rcl_publisher_t debug_encoder_publisher;
@@ -237,14 +237,14 @@ bool destroyEntities()
 
 void Move()
 {
-    // Differential drive kinematics : wheel speed = linear velocity - (angular velocity * wheel_base / 2)
+    // Differential drive kinematics : wheel speed = linear velocity - (angular velocity * LR_WHEELS_DISTANCE / 2)
 
     // left wheels
-    float motor1Speed = moveMotor_msg.linear.x - (moveMotor_msg.angular.z * WHEEL_BASE / 2.0);
-    float motor2Speed = moveMotor_msg.linear.x - (moveMotor_msg.angular.z * WHEEL_BASE / 2.0); 
+    float motor1Speed = moveMotor_msg.linear.x - (moveMotor_msg.angular.z * LR_WHEELS_DISTANCE / 2.0);
+    float motor2Speed = moveMotor_msg.linear.x - (moveMotor_msg.angular.z * LR_WHEELS_DISTANCE / 2.0); 
     // right wheels
-    float motor3Speed = moveMotor_msg.linear.x + (moveMotor_msg.angular.z * WHEEL_BASE / 2.0); 
-    float motor4Speed = moveMotor_msg.linear.x + (moveMotor_msg.angular.z * WHEEL_BASE / 2.0);
+    float motor3Speed = moveMotor_msg.linear.x + (moveMotor_msg.angular.z * LR_WHEELS_DISTANCE / 2.0); 
+    float motor4Speed = moveMotor_msg.linear.x + (moveMotor_msg.angular.z * LR_WHEELS_DISTANCE / 2.0);
 
     MovePower(motor1Speed, motor2Speed,
               motor3Speed, motor4Speed);
