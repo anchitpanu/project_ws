@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from src.utilize import *
+from quin_core.utilize import *
 import time
 
 class Controller:

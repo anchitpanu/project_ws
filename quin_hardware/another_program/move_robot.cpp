@@ -190,11 +190,11 @@ bool createEntities()
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
         "debug/motor"));
 
-    RCCHECK(rclc_subscription_init_default(
-        &moveMotor_subscriber,
-        &node,
-        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-        "/motor_speed"));
+    // RCCHECK(rclc_subscription_init_default(
+    //     &moveMotor_subscriber,
+    //     &node,
+    //     ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+    //     "/motor_speed"));
 
     // create timer for actuating the motors at 50 Hz (1000/20)
     const unsigned int control_timeout = 20;

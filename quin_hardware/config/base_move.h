@@ -52,24 +52,24 @@ ROBOT ORIENTATION
 #define MOTOR4_BRAKE true
 
 // Motor 1 Parameters
-#define MOTOR1_PWM  0
-#define MOTOR1_IN_A 1
-#define MOTOR1_IN_B 2
+// #define MOTOR1_PWM  0
+#define MOTOR1_IN_A 35
+#define MOTOR1_IN_B 32
 
 // Motor 2 Parameters
-#define MOTOR2_PWM  3
-#define MOTOR2_IN_A 4
-#define MOTOR2_IN_B 5
+// #define MOTOR2_PWM  3
+#define MOTOR2_IN_A 33
+#define MOTOR2_IN_B 25
 
 // Motor 3 Parameters
-#define MOTOR3_PWM  6
-#define MOTOR3_IN_A 7 
-#define MOTOR3_IN_B 8
+// #define MOTOR3_PWM  6
+#define MOTOR3_IN_A 19
+#define MOTOR3_IN_B 18
 
 // Motor 4 Parameters
-#define MOTOR4_PWM  9
-#define MOTOR4_IN_A 10
-#define MOTOR4_IN_B 11
+// #define MOTOR4_PWM  9
+#define MOTOR4_IN_A 16
+#define MOTOR4_IN_B 17
 
 // INVERT ENCODER DIRECTIONS
 #define MOTOR1_ENCODER_INV true
@@ -77,28 +77,28 @@ ROBOT ORIENTATION
 #define MOTOR3_ENCODER_INV true 
 #define MOTOR4_ENCODER_INV false
 
-// Encoder 1 Parameter
-#define MOTOR1_ENCODER_INCRIMENT 23
-#define MOTOR1_ENCODER_PIN_A 22
-#define MOTOR1_ENCODER_PIN_B 21
+// // Encoder 1 Parameter
+// #define MOTOR1_ENCODER_INCRIMENT 23
+// #define MOTOR1_ENCODER_PIN_A 22
+// #define MOTOR1_ENCODER_PIN_B 21
 
-// Encoder 2 Parameter
-#define MOTOR2_ENCODER_INCRIMENT 20
-#define MOTOR2_ENCODER_PIN_A 17
-#define MOTOR2_ENCODER_PIN_B 16
+// // Encoder 2 Parameter
+// #define MOTOR2_ENCODER_INCRIMENT 20
+// #define MOTOR2_ENCODER_PIN_A 17
+// #define MOTOR2_ENCODER_PIN_B 16
 
-// Encoder 3 Parameter
-#define MOTOR3_ENCODER_INCRIMENT 15
-#define MOTOR3_ENCODER_PIN_A 14  
-#define MOTOR3_ENCODER_PIN_B 41 
+// // Encoder 3 Parameter
+// #define MOTOR3_ENCODER_INCRIMENT 15
+// #define MOTOR3_ENCODER_PIN_A 14  
+// #define MOTOR3_ENCODER_PIN_B 41 
 
-// Encoder 4 Parameter
-#define MOTOR4_ENCODER_INCRIMENT 40
-#define MOTOR4_ENCODER_PIN_A 39
-#define MOTOR4_ENCODER_PIN_B 38
+// // Encoder 4 Parameter
+// #define MOTOR4_ENCODER_INCRIMENT 40
+// #define MOTOR4_ENCODER_PIN_A 39
+// #define MOTOR4_ENCODER_PIN_B 38
 
-// I2C communication
-#define SCL_PIN 19
-#define SDA_PIN 18
+// // I2C communication
+// #define SCL_PIN 19
+// #define SDA_PIN 18
 
-#endif
+// #endif

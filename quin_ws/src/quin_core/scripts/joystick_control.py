@@ -39,7 +39,8 @@ class Gamepad:
 
         #----------------------------------------------------------------
         
-        self.drill: bool = False 
+        self.drill: bool = False
+        self.spin: bool = False
         self.toggle_encoder_bool : bool = False
 
         self.previous_triangle_state = False
@@ -49,7 +50,7 @@ class Gamepad:
 
 
 
-        self.last_macro_button = None  # Stores 'drill'
+        self.last_macro_button = None  # Stores 'drill' 'spin'
 
 
     def update_drill(self):
@@ -61,11 +62,11 @@ class Gamepad:
                 self.last_macro_button = None
         self.previous_triangle_state = self.button_triangle
 
-    def update_roulette(self):
+    def update_spin(self):
         if self.button_circle and not self.previous_circle_state:
-            self.roulette = not self.roulette
-            if self.roulette:
-                self.last_macro_button = 'roulette'
+            self.spinupdate_spin = not self.spin
+            if self.spin:
+                self.last_macro_button = 'spin'
             else:
                 self.last_macro_button = None
         self.previous_circle_state = self.button_circle
@@ -77,7 +78,8 @@ class Gamepad:
         self.previous_PressedRightAnalog_state = self.PressedRightAnalog
 
     def reset_toggles(self):
-        self.drill = False 
+        self.drill = False
+        self.spin = False 
         self.last_macro_button = None
         
 
@@ -97,7 +99,7 @@ class Joystick(Node):
         self.pub_encoder = self.create_publisher(
             Twist, "/quin/cmd_encoder", qos_profile=qos.qos_profile_system_default
         )
-        
+
         self.create_subscription(
             Joy, '/quin/joy', self.joy, qos_profile=qos.qos_profile_sensor_data # 10
         )
@@ -142,7 +144,7 @@ class Joystick(Node):
         #Macro-----------------------------------------------------------
         
         self.gamepad.update_drill()
-        self.gamepad.update_roulette()
+        self.gamepad.update_spin()
         self.gamepad.update_toggle_encoder()
     
         
@@ -168,7 +170,7 @@ class Joystick(Node):
         if self.gamepad.last_macro_button == 'drill' and self.gamepad.drill:
             cmd_vel_macro.linear.x = 1.0
 
-        if self.gamepad.last_macro_button == 'roulette' and self.gamepad.roulette:
+        if self.gamepad.last_macro_button == 'spin' and self.gamepad.spin:
             cmd_vel_macro.linear.y = 1.0
 
         if self.gamepad.toggle_encoder_bool:

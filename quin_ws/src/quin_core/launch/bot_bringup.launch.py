@@ -30,46 +30,46 @@ def generate_launch_description():
         # parameters=[], #Testing
     )
 
-    apriltag_auto_aim = Node(
-        package="quin_core",
-        executable="apriltag_auto_aim",
-        name="Apriltag_Distance",
-        # output="screen",
-        namespace="",
-        # parameters=[], #Testing
-    )
+    # apriltag_auto_aim = Node(
+    #     package="quin_core",
+    #     executable="apriltag_auto_aim",
+    #     name="Apriltag_Distance",
+    #     # output="screen",
+    #     namespace="",
+    #     # parameters=[], #Testing
+    # )
 
-    hoop_detection = Node(
-        package="quin_core",
-        executable="hoop_detection.py",
-        name="Hoop_Detection",
-        output="screen",
-        namespace="",
-        # parameters=[], #Testing
-    )
+    # hoop_detection = Node(
+    #     package="quin_core",
+    #     executable="hoop_detection.py",
+    #     name="Hoop_Detection",
+    #     output="screen",
+    #     namespace="",
+    #     # parameters=[], #Testing
+    # )
 
-    camera_driver = Node(
-        package='v4l2_camera',
-        executable='v4l2_camera_node',
-        name='camera',
-        parameters=[{
-            'video_device': '/dev/video0',
-            'image_size': [640, 480],
-            'time_per_frame': [1, 20]  # 30 FPS
-        }],
-        remappings=[
-            ('/image_raw', '/shaq/image_raw')
-        ],
-        output='screen'
-    )
+    # camera_driver = Node(
+    #     package='v4l2_camera',
+    #     executable='v4l2_camera_node',
+    #     name='camera',
+    #     parameters=[{
+    #         'video_device': '/dev/video0',
+    #         'image_size': [640, 480],
+    #         'time_per_frame': [1, 20]  # 30 FPS
+    #     }],
+    #     remappings=[
+    #         ('/image_raw', '/shaq/image_raw')
+    #     ],
+    #     output='screen'
+    # )
 
 
 
     # Add actions to the launch description
     ld.add_action(microros_launch)
     ld.add_action(cmd_move)
-    ld.add_action(camera_driver)
-    ld.add_action(apriltag_auto_aim)
+    # ld.add_action(camera_driver)
+    # ld.add_action(apriltag_auto_aim)
     # ld.add_action(hoop_detection)
 
 

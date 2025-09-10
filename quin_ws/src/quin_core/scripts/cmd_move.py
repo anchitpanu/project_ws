@@ -7,49 +7,61 @@ from std_msgs.msg import String, Int16MultiArray
 from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import Twist
 from rclpy import qos
-from kobe_core.utilize import *
-from kobe_core.controller import *
+from quin_core.utilize import *
+from quin_core.controller import *
 import time 
 
 class Cmd_vel_to_motor_speed(Node):
 
     def __init__(self):
-        super().__init__("Cmd_vel_to_motor_speed")
+        super().__init__("Cmd_move")
         
         self.moveSpeed: float = 0.0
         self.turnSpeed: float = 0.0
 
-        self.maxSpeed : float = 1023.0
+        self.maxSpeed : float = 1023.0  # pwm
         self.maxRPM : int = 6000
         self.max_linear_speed = 3.0  # m/s max
 
-        self.wheel_base = 0.4         # Distance between left-right wheels (m)
-        self.wheel_radius = 0.05      # Wheel radius (m)
+        self.wheel_base = 0.375             # Distance between left-right wheels (m)
+        self.wheel_radius = 0.085/2         # Wheel radius (m)
 
         self.motor1Speed : float = 0
         self.motor2Speed : float = 0
         self.motor3Speed : float = 0
         self.motor4Speed : float = 0
 
-        # self.yaw : float = 0
-        # self.yaw_setpoint = self.yaw
+        self.yaw : float = 0
+        self.yaw_setpoint = self.yaw
 
-        self.previous_manual_turn = time.time()
+        # self.previous_manual_turn = time.time()
 
         # self.controller = Controller(kp = 1.0, ki = 0.05, kd = 0.001, baseSpeed = 0.3  ,errorTolerance = To_Radians(0.5), i_min= -1, i_max= 1)
             
-        self.macro_active = False
+        # self.macro_active = False
 
         self.send_robot_speed = self.create_publisher(
             Twist, "/quin/cmd_move/rpm", qos_profile=qos.qos_profile_system_default
         )
 
+        # self.send_spin_speed = self.create_publisher(
+        #     Twist, "/quin/cmd_spin/rpm", qos_profile=qos.qos_profile_system_default
+        # )
+
         self.create_subscription(
             Twist, '/quin/cmd_move', self.cmd_move, qos_profile=qos.qos_profile_system_default
         )
+
+        # self.create_subscription(
+        #     Twist, '/quin/cmd_spin', self.cmd_spin, qos_profile=qos.qos_profile_system_default
+        # )
         
+        # self.create_subscription(
+        #     Twist, '/quin/cmd_macro', self.cmd_macro, qos_profile=qos.qos_profile_sensor_data # 10
+        # )
+
         self.create_subscription(
-            Twist, '/quin/cmd_macro', self.cmd_macro, qos_profile=qos.qos_profile_sensor_data # 10
+            Twist, "/quin/cmd_encoder", self.encoder, qos_profile=qos.qos_profile_sensor_data
         )
 
 
@@ -59,67 +71,39 @@ class Cmd_vel_to_motor_speed(Node):
     def get_pid(self,msg):
         self.controller.ConfigPIDF(kp = msg.data[0], ki= msg.data[1], kd=msg.data[2], kf=msg.data[3]) 
 
+    def encoder(self,msg):
+        self.encoder_mode = msg.linear.x    # 1 Bit, 2 RPM
+
     def cmd_move(self, msg):
 
-        CurrentTime = time.time()
-        self.moveSpeed = msg.linear.y       # Forward/Backward
-        self.turnSpeed = msg.angular.z      # Rotation
-        
-        rotation = self.controller.Calculate(WrapRads(self.yaw_setpoint - self.yaw))
-        rotation = clip(rotation, -1.0, 1.0)
-        if self.moveSpeed  == 0 and self.turnSpeed == 0 and abs(rotation) < 0.2:
-            rotation = 0
+        self.moveSpeed = msg.linear.y           # Forward/Backward
+        self.turnSpeed = msg.angular.z          # Rotation
+        self.turnSpeed = self.turnSpeed * 5     # Scale factor for angular velocity
 
+        # Compute left and right wheel speeds (in m/s)
+        left_speed = self.moveSpeed - (self.turnSpeed * self.wheel_base / 2.0)
+        right_speed = self.moveSpeed + (self.turnSpeed * self.wheel_base / 2.0)
 
-        self.previous_manual_turn = CurrentTime if self.turnSpeed != 0 else self.previous_manual_turn
+        # Convert to motor speeds in RPM (optional)
+        rpm_left = float(left_speed * self.maxRPM)
+        rpm_right = float(right_speed * self.maxRPM)
 
+        # Store or send these speeds to motor controller
+        self.motor1Speed = rpm_left
+        self.motor2Speed = rpm_right
 
-        """
-        
-        (Motor2)//-------------\\(Motor1)
-                |               |
-                |               |
-                |               |
-                |               |               
-        (Motor3)\\-------------//(Motor4)
+        print(f"Left Motor: {self.motor1Speed:.2f} RPM, Right Motor: {self.motor2Speed:.2f} RPM")
 
-
-        """
-
-        # Differential drive calculation
-        left_speed  = (self.moveSpeed - rotation) * self.maxSpeed
-        right_speed = (self.moveSpeed + rotation) * self.maxSpeed
-
-        # Assign to motors
-        self.motor1Speed = float("{:.1f}".format(left_speed))   # Front Left
-        self.motor3Speed = float("{:.1f}".format(left_speed))   # Back Left
-        self.motor2Speed = float("{:.1f}".format(right_speed))  # Front Right
-        self.motor4Speed = float("{:.1f}".format(right_speed))  # Back Right
-
-            
     def sendData(self):
         motorspeed_msg = Twist()
-
-
-        """
-        
-        (Motor2)//-------------\\(Motor1)
-                |               |
-                |               |
-                |               |
-                |               |               
-        (Motor3)\\-------------//(Motor4)
-  
-        
-        """
-
        
-        motorspeed_msg.linear.x = float(self.motor1Speed) 
+        motorspeed_msg.linear.x = float(self.motor1Speed)
         motorspeed_msg.linear.y = float(self.motor2Speed)
-        motorspeed_msg.linear.z = float(self.motor3Speed) 
-        motorspeed_msg.angular.x = float(self.motor4Speed) 
-
+        
         self.send_robot_speed.publish(motorspeed_msg)
+
+    # def cmd_spin(self, msg):
+
 
 
 def main():
