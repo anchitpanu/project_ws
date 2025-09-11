@@ -13,11 +13,9 @@
 #include <std_msgs/msg/int32.h>
 
 #include <config.h>
-#include <imu_bno055.h>
-#include <encoder.h>
-#include <PIDF.h>
-#include <motorprik.h>
+#include <ESP32Encoder.h>
 
+#include "../config/base_move.h"
 
 #define ENCODER_USE_INTERRUPTS
 #define ENCODER_OPTIMIZE_INTERRUPTS
@@ -88,22 +86,22 @@ enum states
   AGENT_DISCONNECTED
 } state;
 
-Encoder motor1_encoder(MOTOR1_ENCODER_PIN_A, MOTOR1_ENCODER_PIN_B, COUNTS_PER_REV1, MOTOR1_ENCODER_INV);
-Encoder motor2_encoder(MOTOR2_ENCODER_PIN_A, MOTOR2_ENCODER_PIN_B, COUNTS_PER_REV2, MOTOR2_ENCODER_INV);
-Encoder motor3_encoder(MOTOR3_ENCODER_PIN_A, MOTOR1_ENCODER_PIN_B, COUNTS_PER_REV3, MOTOR3_ENCODER_INV);
-Encoder motor4_encoder(MOTOR4_ENCODER_PIN_A, MOTOR4_ENCODER_PIN_B, COUNTS_PER_REV4, MOTOR4_ENCODER_INV);
+// Encoder motor1_encoder(MOTOR1_ENCODER_PIN_A, MOTOR1_ENCODER_PIN_B, COUNTS_PER_REV1, MOTOR1_ENCODER_INV);
+// Encoder motor2_encoder(MOTOR2_ENCODER_PIN_A, MOTOR2_ENCODER_PIN_B, COUNTS_PER_REV2, MOTOR2_ENCODER_INV);
+// Encoder motor3_encoder(MOTOR3_ENCODER_PIN_A, MOTOR1_ENCODER_PIN_B, COUNTS_PER_REV3, MOTOR3_ENCODER_INV);
+// Encoder motor4_encoder(MOTOR4_ENCODER_PIN_A, MOTOR4_ENCODER_PIN_B, COUNTS_PER_REV4, MOTOR4_ENCODER_INV);
 
-Motor motor1_controller(PWM_FREQUENCY, PWM_BITS, MOTOR1_INV, MOTOR1_BRAKE, MOTOR1_PWM, MOTOR1_IN_A, MOTOR1_IN_B);
-Motor motor2_controller(PWM_FREQUENCY, PWM_BITS, MOTOR2_INV, MOTOR2_BRAKE, MOTOR2_PWM, MOTOR2_IN_A, MOTOR2_IN_B);
-Motor motor3_controller(PWM_FREQUENCY, PWM_BITS, MOTOR3_INV, MOTOR3_BRAKE, MOTOR3_PWM, MOTOR3_IN_A, MOTOR3_IN_B);
-Motor motor4_controller(PWM_FREQUENCY, PWM_BITS, MOTOR4_INV, MOTOR4_BRAKE, MOTOR4_PWM, MOTOR4_IN_A, MOTOR4_IN_B);
+Motor motor1_controller(PWM_FREQUENCY, PWM_BITS, MOTOR1_INV, MOTOR1_BRAKE, MOTOR1_IN_A, MOTOR1_IN_B);
+Motor motor2_controller(PWM_FREQUENCY, PWM_BITS, MOTOR2_INV, MOTOR2_BRAKE, MOTOR2_IN_A, MOTOR2_IN_B);
+Motor motor3_controller(PWM_FREQUENCY, PWM_BITS, MOTOR3_INV, MOTOR3_BRAKE, MOTOR3_IN_A, MOTOR3_IN_B);
+Motor motor4_controller(PWM_FREQUENCY, PWM_BITS, MOTOR4_INV, MOTOR4_BRAKE, MOTOR4_IN_A, MOTOR4_IN_B);
 
-PIDF motor1_pid(I_Min, I_Max, PWM_Min, PWM_Max, K_P, K_I, K_D, K_F);
-PIDF motor2_pid(I_Min, I_Max, PWM_Min, PWM_Max, K_P, K_I, K_D, K_F);
-PIDF motor3_pid(I_Min, I_Max, PWM_Min, PWM_Max, K_P, K_I, K_D, K_F);
-PIDF motor4_pid(I_Min, I_Max, PWM_Min, PWM_Max, K_P, K_I, K_D, K_F);
+// PIDF motor1_pid(I_Min, I_Max, PWM_Min, PWM_Max, K_P, K_I, K_D, K_F);
+// PIDF motor2_pid(I_Min, I_Max, PWM_Min, PWM_Max, K_P, K_I, K_D, K_F);
+// PIDF motor3_pid(I_Min, I_Max, PWM_Min, PWM_Max, K_P, K_I, K_D, K_F);
+// PIDF motor4_pid(I_Min, I_Max, PWM_Min, PWM_Max, K_P, K_I, K_D, K_F);
 
-IMU_BNO055 bno055;
+// IMU_BNO055 bno055;
 
 void flashLED(int n_times)
 {
@@ -145,7 +143,7 @@ struct timespec getTime()
 
 void imu_pub()
 {
-  bno055.getIMUData(imu_data_msg, imu_mag_msg, imu_pos_angle_msg);
+  // bno055.getIMUData(imu_data_msg, imu_mag_msg, imu_pos_angle_msg);
 
   struct timespec time_stamp = getTime();
   imu_data_msg.header.stamp.sec = time_stamp.tv_sec;
@@ -197,8 +195,8 @@ void motor_control()
 
 
   // Convert to RPM
-  float left_rpm  = (linear - angular * WHEELS_DISTANCE / 2.0) * 60.0 / (PI * WHEEL_DIAMETER);
-  float right_rpm = (linear + angular * WHEELS_DISTANCE / 2.0) * 60.0 / (PI * WHEEL_DIAMETER);
+  float left_rpm  = (linear - angular * LR_WHEELS_DISTANCE / 2.0) * 60.0 / (PI * WHEEL_DIAMETER);
+  float right_rpm = (linear + angular * LR_WHEELS_DISTANCE / 2.0) * 60.0 / (PI * WHEEL_DIAMETER);
 
   motor1_controller.spin(left_rpm);
   motor2_controller.spin(right_rpm);
@@ -243,7 +241,7 @@ bool create_entities()
 
   init_options = rcl_get_zero_initialized_init_options();
   rcl_init_options_init(&init_options, allocator);
-  rcl_init_options_set_domain_id(&init_options, 10);
+  rcl_init_options_set_domain_id(&init_options, 77);
 
   rclc_support_init_with_options(&support, 0, NULL, &init_options, &allocator);
 
@@ -333,7 +331,7 @@ void setup()
   pinMode(LED_PIN, OUTPUT);
   state = WAITING_AGENT;
 
-  bno055.init();
+  // bno055.init();
 
   digitalWrite(LED_PIN, HIGH);
   delay(2000);

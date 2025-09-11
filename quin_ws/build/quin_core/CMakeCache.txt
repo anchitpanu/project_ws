@@ -239,7 +239,11 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //The directory containing a CMake configuration file for CycloneDDS.
+<<<<<<< HEAD
 CycloneDDS_DIR:PATH=/opt/ros/jazzy/lib/x86_64-linux-gnu/cmake/CycloneDDS
+=======
+CycloneDDS_DIR:PATH=/opt/ros/jazzy/lib/aarch64-linux-gnu/cmake/CycloneDDS
+>>>>>>> 63150ec (move)
 
 //The directory containing a CMake configuration file for Eigen3.
 Eigen3_DIR:PATH=/usr/share/eigen3/cmake
@@ -251,7 +255,11 @@ OpenCV_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/opencv4
 RMW_IMPLEMENTATION:STRING=rmw_cyclonedds_cpp
 
 //Name of the computer/site where compile is being run
+<<<<<<< HEAD
 SITE:STRING=earn
+=======
+SITE:STRING=quin
+>>>>>>> 63150ec (move)
 
 //Path to a library.
 _lib:FILEPATH=/opt/ros/jazzy/lib/libtf2_msgs__rosidl_typesupport_fastrtps_cpp.so
@@ -341,6 +349,7 @@ fastrtps_cmake_module_DIR:PATH=/opt/ros/jazzy/share/fastrtps_cmake_module/cmake
 geometry_msgs_DIR:PATH=/opt/ros/jazzy/share/geometry_msgs/cmake
 
 //The directory containing a CMake configuration file for iceoryx_binding_c.
+<<<<<<< HEAD
 iceoryx_binding_c_DIR:PATH=/opt/ros/jazzy/lib/x86_64-linux-gnu/cmake/iceoryx_binding_c
 
 //The directory containing a CMake configuration file for iceoryx_hoofs.
@@ -348,6 +357,15 @@ iceoryx_hoofs_DIR:PATH=/opt/ros/jazzy/lib/x86_64-linux-gnu/cmake/iceoryx_hoofs
 
 //The directory containing a CMake configuration file for iceoryx_posh.
 iceoryx_posh_DIR:PATH=/opt/ros/jazzy/lib/x86_64-linux-gnu/cmake/iceoryx_posh
+=======
+iceoryx_binding_c_DIR:PATH=/opt/ros/jazzy/lib/aarch64-linux-gnu/cmake/iceoryx_binding_c
+
+//The directory containing a CMake configuration file for iceoryx_hoofs.
+iceoryx_hoofs_DIR:PATH=/opt/ros/jazzy/lib/aarch64-linux-gnu/cmake/iceoryx_hoofs
+
+//The directory containing a CMake configuration file for iceoryx_posh.
+iceoryx_posh_DIR:PATH=/opt/ros/jazzy/lib/aarch64-linux-gnu/cmake/iceoryx_posh
+>>>>>>> 63150ec (move)
 
 //The directory containing a CMake configuration file for libstatistics_collector.
 libstatistics_collector_DIR:PATH=/opt/ros/jazzy/share/libstatistics_collector/cmake

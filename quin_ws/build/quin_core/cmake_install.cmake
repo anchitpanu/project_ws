@@ -76,8 +76,13 @@ endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/quin_core" TYPE PROGRAM FILES
+<<<<<<< HEAD
     "/home/earn/project_ws/quin_ws/src/quin_core/scripts/joystick_control.py"
     "/home/earn/project_ws/quin_ws/src/quin_core/scripts/cmd_move.py"
+=======
+    "/home/quin/project_ws/quin_ws/src/quin_core/scripts/joystick_control.py"
+    "/home/quin/project_ws/quin_ws/src/quin_core/scripts/cmd_move.py"
+>>>>>>> 63150ec (move)
     )
 endif()
 

@@ -1,0 +1,195 @@
+-- The C compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent
+[  6%] [34m[1mCreating directories for 'xrceagent'[0m
+[ 12%] [34m[1mPerforming download step (git clone) for 'xrceagent'[0m
+[ 18%] [34m[1mPerforming update step for 'xrceagent'[0m
+[ 25%] [34m[1mNo patch step for 'xrceagent'[0m
+[ 31%] [34m[1mPerforming configure step for 'xrceagent'[0m
+loading initial cache file /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/tmp/xrceagent-cache-.cmake
+-- The C compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build
+[ 37%] [34m[1mPerforming build step for 'xrceagent'[0m
+[  6%] [34m[1mCreating directories for 'spdlog'[0m
+[ 12%] [34m[1mPerforming download step (git clone) for 'spdlog'[0m
+[ 18%] [34m[1mPerforming update step for 'spdlog'[0m
+[ 25%] [34m[1mNo patch step for 'spdlog'[0m
+[ 31%] [34m[1mPerforming configure step for 'spdlog'[0m
+loading initial cache file /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/spdlog/tmp/spdlog-cache-.cmake
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Build spdlog: 1.9.2
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Build type: Release
+-- Generating example(s)
+-- Generating install
+-- Configuring done (0.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/spdlog/src/spdlog-build
+[ 37%] [34m[1mPerforming build step for 'spdlog'[0m
+[ 30%] [32mBuilding CXX object CMakeFiles/spdlog.dir/src/stdout_sinks.cpp.o[0m
+[ 10%] [32mBuilding CXX object CMakeFiles/spdlog.dir/src/spdlog.cpp.o[0m
+[ 30%] [32mBuilding CXX object CMakeFiles/spdlog.dir/src/color_sinks.cpp.o[0m
+[ 40%] [32mBuilding CXX object CMakeFiles/spdlog.dir/src/file_sinks.cpp.o[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/spdlog.dir/src/async.cpp.o[0m
+[ 60%] [32mBuilding CXX object CMakeFiles/spdlog.dir/src/cfg.cpp.o[0m
+[ 70%] [32mBuilding CXX object CMakeFiles/spdlog.dir/src/fmt.cpp.o[0m
+[ 80%] [32m[1mLinking CXX static library libspdlog.a[0m
+[ 80%] Built target spdlog
+[ 90%] [32mBuilding CXX object example/CMakeFiles/example.dir/example.cpp.o[0m
+[100%] [32m[1mLinking CXX executable example[0m
+[100%] Built target example
+[ 43%] [34m[1mPerforming install step for 'spdlog'[0m
+[ 80%] Built target spdlog
+[100%] Built target example
+[36mInstall the project...[0m
+-- Install configuration: "Release"
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/logger.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/spdlog-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/cfg
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/cfg/env.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/cfg/argv.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/cfg/helpers.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/cfg/helpers-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/pattern_formatter.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/circular_q.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/log_msg.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/file_helper.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/null_mutex.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/tcp_client-windows.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/tcp_client.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/log_msg_buffer-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/log_msg_buffer.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/thread_pool.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/fmt_helper.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/os.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/thread_pool-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/os-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/synchronous_factory.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/file_helper-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/console_globals.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/backtracer.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/registry.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/mpmc_blocking_q.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/log_msg-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/periodic_worker.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/backtracer-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/windows_include.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/registry-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/details/periodic_worker-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bin_to_hex.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/chrono.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/fmt.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/compile.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/xchar.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/ostr.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/formatter.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fwd.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/spdlog.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/async_logger-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/logger-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/stopwatch.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/version.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/tweakme.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/async.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/pattern_formatter-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/common-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/basic_file_sink-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/wincolor_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/base_sink-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/stdout_color_sinks-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/systemd_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/daily_file_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/stdout_color_sinks.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/hourly_file_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/wincolor_sink-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/msvc_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/qt_sinks.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/basic_file_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/syslog_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/stdout_sinks-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/base_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/dist_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/null_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/sink-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/dup_filter_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/android_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/mongo_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/tcp_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/ringbuffer_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/rotating_file_sink-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/rotating_file_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/ansicolor_sink-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/stdout_sinks.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/ostream_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/ansicolor_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/sinks/win_eventlog_sink.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/common.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/async_logger.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/lib/libspdlog.a
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled/
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//format-inl.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//locale.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//chrono.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//ranges.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//core.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//compile.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//os.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//xchar.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//args.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//format.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//color.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//printf.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/include/spdlog/fmt/bundled//ostream.h
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/lib/pkgconfig/spdlog.pc
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/lib/cmake/spdlog/spdlogConfigTargets.cmake
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/lib/cmake/spdlog/spdlogConfigTargets-release.cmake
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/lib/cmake/spdlog/spdlogConfig.cmake
+-- Installing: /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/temp_install/spdlog-1.9.2/lib/cmake/spdlog/spdlogConfigVersion.cmake
+[ 50%] [34m[1mCompleted 'spdlog'[0m
+[ 50%] Built target spdlog
+[ 56%] [34m[1mCreating directories for 'uagent'[0m
+[ 62%] [34m[1mNo download step for 'uagent'[0m
+[ 68%] [34m[1mNo update step for 'uagent'[0m
+[ 75%] [34m[1mNo patch step for 'uagent'[0m
+[ 81%] [34m[1mPerforming configure step for 'uagent'[0m
+loading initial cache file /home/quin/project_ws/quin_ws/src/build/micro_ros_agent/agent/src/xrceagent-build/uagent-prefix/tmp/uagent-cache-.cmake
+-- Setting build type to 'Release' as none was specified.
+-- Configuring incomplete, errors occurred!

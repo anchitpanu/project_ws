@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/launch/bot_bringup.launch.py
 /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/launch/joystickController.launch.py
 /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/launch/microros.launch.py
@@ -33,3 +34,42 @@
 /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/cmake/quin_coreConfig.cmake
 /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/cmake/quin_coreConfig-version.cmake
 /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/package.xml
+=======
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/launch/joystickController.launch.py
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/launch/microros.launch.py
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/launch/bot_bringup.launch.py
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/cmd_move.py
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/joystick_control
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/cmd_move
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/joystick_control.py
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/config/locations.yaml
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/config/motor_config.yaml
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/pythonpath.sh
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/pythonpath.dsv
+/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/SOURCES.txt
+/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/top_level.txt
+/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/PKG-INFO
+/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/dependency_links.txt
+/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core/utilize.py
+/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core/__init__.py
+/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core/controller.py
+/home/quin/project_ws/quin_ws/install/quin_core/lib/quin_core/joystick_control.py
+/home/quin/project_ws/quin_ws/install/quin_core/lib/quin_core/cmd_move.py
+/home/quin/project_ws/quin_ws/install/quin_core/lib/quin_core/src/controller.py
+/home/quin/project_ws/quin_ws/install/quin_core/lib/quin_core/src/utilize.py
+/home/quin/project_ws/quin_ws/install/quin_core/share/ament_index/resource_index/package_run_dependencies/quin_core
+/home/quin/project_ws/quin_ws/install/quin_core/share/ament_index/resource_index/parent_prefix_path/quin_core
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/ament_prefix_path.sh
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/ament_prefix_path.dsv
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/path.sh
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/environment/path.dsv
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.bash
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.sh
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.zsh
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.dsv
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/package.dsv
+/home/quin/project_ws/quin_ws/install/quin_core/share/ament_index/resource_index/packages/quin_core
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/cmake/quin_coreConfig.cmake
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/cmake/quin_coreConfig-version.cmake
+/home/quin/project_ws/quin_ws/install/quin_core/share/quin_core/package.xml
+>>>>>>> 63150ec (move)

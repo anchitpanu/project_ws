@@ -31,13 +31,14 @@ def generate_launch_description():
 
     joystick_control = Node(
         package="quin_core",
-        executable="joystick_control",
+        executable="joystick_control.py",
         name="Joystick_Node",
         # output="screen",
         namespace="",
     )
     
     
+<<<<<<< HEAD
     # cmd_vel_to_motor_speed = Node(
     #     package="quin_core",
     #     executable="cmd_move",
@@ -46,6 +47,16 @@ def generate_launch_description():
     #     namespace="",
     #     # parameters=[motor_config], #Testing
     # )
+=======
+    cmd_vel_to_motor_speed = Node(
+        package="quin_core",
+        executable="cmd_move.py",
+        name="Cmd_move",
+        # output="screen",
+        namespace="",
+        # parameters=[motor_config], #Testing
+    )
+>>>>>>> 63150ec (move)
     
     # joy_auto = Node(
     #     package="quin_core",
