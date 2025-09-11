@@ -1,2 +1,5 @@
 /quin_ws/install/
 /quin_ws/**/build/
+/**/build/
+/**/install/
+/**/log/
