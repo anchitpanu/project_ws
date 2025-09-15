@@ -18,10 +18,10 @@ ROBOT ORIENTATION
 #define I_Min -1 
 
 //define your robot' specs here
-#define MOTOR_MAX_RPM 750                                               // motor's max RPM          
+#define MOTOR_MAX_RPM 60                                                // motor's max RPM          
 #define MAX_RPM_RATIO 0.85                                              // max RPM allowed for each MAX_RPM_ALLOWED = MOTOR_MAX_RPM * MAX_RPM_RATIO          
-#define MOTOR_OPERATING_VOLTAGE 24                                      // motor's operating voltage (used to calculate max RPM)
-#define MOTOR_POWER_MAX_VOLTAGE 24                                      // max voltage of the motor's power source (used to calculate max RPM)
+#define MOTOR_OPERATING_VOLTAGE 12                                      // motor's operating voltage (used to calculate max RPM)
+#define MOTOR_POWER_MAX_VOLTAGE 12                                      // max voltage of the motor's power source (used to calculate max RPM)
 #define MOTOR_POWER_MEASURED_VOLTAGE 24                                 // current voltage reading of the power connected to the motor (used for calibration)
 #define ENCODER1_PULSES_PER_REVOLUTION 2500                             // encoder 1 pulse
 #define ENCODER2_PULSES_PER_REVOLUTION 2000                             // encoder 2 pulse

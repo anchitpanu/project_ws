@@ -44,21 +44,21 @@ class Cmd_vel_to_motor_speed(Node):
             Twist, "/quin/cmd_move/rpm", qos_profile=qos.qos_profile_system_default
         )
 
-        # self.send_spin_speed = self.create_publisher(
-        #     Twist, "/quin/cmd_spin/rpm", qos_profile=qos.qos_profile_system_default
-        # )
+        self.send_spin_speed = self.create_publisher(
+            Twist, "/quin/cmd_spin/rpm", qos_profile=qos.qos_profile_system_default
+        )
 
         self.create_subscription(
             Twist, '/quin/cmd_move', self.cmd_move, qos_profile=qos.qos_profile_system_default
         )
 
-        # self.create_subscription(
-        #     Twist, '/quin/cmd_spin', self.cmd_spin, qos_profile=qos.qos_profile_system_default
-        # )
+        self.create_subscription(
+            Twist, '/quin/cmd_spin', self.cmd_spin, qos_profile=qos.qos_profile_system_default
+        )
         
-        # self.create_subscription(
-        #     Twist, '/quin/cmd_macro', self.cmd_macro, qos_profile=qos.qos_profile_sensor_data # 10
-        # )
+        self.create_subscription(
+            Twist, '/quin/cmd_macro', self.cmd_macro, qos_profile=qos.qos_profile_sensor_data # 10
+        )
 
         self.create_subscription(
             Twist, "/quin/cmd_encoder", self.encoder, qos_profile=qos.qos_profile_sensor_data
@@ -94,16 +94,27 @@ class Cmd_vel_to_motor_speed(Node):
 
         print(f"Left Motor: {self.motor1Speed:.2f} RPM, Right Motor: {self.motor2Speed:.2f} RPM")
 
+
+    def cmd_spin(self, msg):
+
+        if msg.angular.z == 1:
+            self.remaining_steps += 205         # 1 rotation = 205 steps
+
+        if msg.angular.z == 2:
+            self.remaining_steps -= 205         # 1 rotation = 205 steps
+
+
     def sendData(self):
         motorspeed_msg = Twist()
        
         motorspeed_msg.linear.x = float(self.motor1Speed)
         motorspeed_msg.linear.y = float(self.motor2Speed)
+
+        motorspin_msg = Twist()
+        motorspin_msg.angular.z = float(self.motorspin1Speed)
         
         self.send_robot_speed.publish(motorspeed_msg)
-
-    # def cmd_spin(self, msg):
-
+        self.send_spin_speed.publish(motorspin_msg)
 
 
 def main():

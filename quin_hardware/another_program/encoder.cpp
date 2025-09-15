@@ -13,7 +13,6 @@
 #include <std_msgs/msg/int16_multi_array.h>
 #include <geometry_msgs/msg/twist.h>
 
-#include "../config/encoder_input.h"
 #include "../config/base_move.h"
 #include <ESP32Encoder.h> 
 

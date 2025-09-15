@@ -11,8 +11,9 @@
 
 #include <geometry_msgs/msg/twist.h>
 #include <ESP32Encoder.h>
+#include <Stepper.h>
 
-#include "../config/base_move.h" 
+#include "../config/spin.h" 
 
 
 // -------- Helpers --------
@@ -23,11 +24,11 @@
 
 // -------- ROS entities --------
 
-rcl_publisher_t debug_motor_publisher;
-geometry_msgs__msg__Twist debug_motor_msg;
+rcl_publisher_t debug_spin_publisher;
+geometry_msgs__msg__Twist debug_spin_msg;
 
-rcl_subscription_t motor_subscriber;        // subscribe /cmd_move
-geometry_msgs__msg__Twist motor_msg;
+rcl_subscription_t spin_subscriber;        // subscribe /cmd_move
+geometry_msgs__msg__Twist spin_msg;
 
 rclc_executor_t executor;
 rclc_support_t support;
@@ -50,6 +51,17 @@ enum states
 } state;
 
 
+// ---------------- Stepper driver ----------------
+Stepper myStepper(STEPS_PER_REV, STEPPER_IN1, STEPPER_IN3, STEPPER_IN2, STEPPER_IN4);
+
+// Movement queue: remaining steps to execute (positive or negative)
+volatile long remaining_steps = 0;
+
+// Edge-detection state for joystick direction
+// -1 = last was LEFT, 0 = neutral, 1 = RIGHT
+int last_dir = 0;
+
+
 // ------ function list ------
 
 void rclErrorLoop();
@@ -58,7 +70,7 @@ bool createEntities();
 bool destroyEntities();
 void publishData();
 struct timespec getTime();
-void Move();
+void Spin();
 
 // ------ main ------
 
@@ -68,19 +80,9 @@ void setup()
     Serial.begin(115200);
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
 
-    // Setup motors
-    pinMode(MOTOR1_IN_A, OUTPUT);   // motor 1
-    pinMode(MOTOR1_IN_B, OUTPUT);
+    myStepper.setSpeed(STEPPER_RPM);
 
-    pinMode(MOTOR2_IN_A, OUTPUT);   // motor 2
-    pinMode(MOTOR2_IN_B, OUTPUT);
-
-    pinMode(MOTOR3_IN_A, OUTPUT);   // motor 3
-    pinMode(MOTOR3_IN_B, OUTPUT);
-
-    pinMode(MOTOR4_IN_A, OUTPUT);   // motor 4
-    pinMode(MOTOR4_IN_B, OUTPUT);
-
+    state = WAITING_AGENT;
 }
 
 void loop() {
@@ -114,7 +116,22 @@ void controlCallback(rcl_timer_t *timer, int64_t last_call_time)
     RCLC_UNUSED(last_call_time);
     if (timer != NULL)
     {
-        Move();
+        Spin();
+
+        long todo = remaining_steps;
+        if (todo != 0) {
+            int chunk = STEP_CHUNK_PER_TICK;
+            if (abs(todo) < chunk) chunk = abs(todo);
+
+            if (todo > 0) {
+            myStepper.step(chunk);
+            remaining_steps -= chunk;
+            } else {
+            myStepper.step(-chunk);
+            remaining_steps += chunk;
+            }
+        }
+
         publishData();
     }
 }
@@ -123,15 +140,13 @@ void twistCallback(const void *msgin)
 {   
     const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
     prev_cmd_time = millis();
-    motor_msg.linear.x = msg->linear.x;   // forward
-    motor_msg.linear.y = msg->linear.y;   // strafe
-    motor_msg.angular.z = msg->angular.z; // rotate
+    spin_msg.angular.z = msg->angular.z; // rotate
 }
 
 bool createEntities()       // create ROS entities 
 {
     allocator = rcl_get_default_allocator();    // manage memory of micro-Ros
-    geometry_msgs__msg__Twist__init(&debug_motor_msg);
+    geometry_msgs__msg__Twist__init(&debug_spin_msg);
 
     init_options = rcl_get_zero_initialized_init_options();
     rcl_init_options_init(&init_options, allocator);
@@ -142,14 +157,14 @@ bool createEntities()       // create ROS entities
     RCCHECK(rclc_node_init_default(&node, "quin_robot_node", "", &support));
 
     RCCHECK(rclc_publisher_init_best_effort(
-        &debug_motor_publisher, &node,
+        &debug_spin_publisher, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-        "/quin/debug/motor"));
+        "/quin/debug/spin"));
 
     RCCHECK(rclc_subscription_init_best_effort(
-        &motor_subscriber, &node,
+        &spin_subscriber, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-        "/quin/cmd_move"));
+        "/quin/cmd_macro"));
 
     const unsigned int control_timeout = 20;
     RCCHECK(rclc_timer_init_default(
@@ -157,10 +172,10 @@ bool createEntities()       // create ROS entities
         RCL_MS_TO_NS(control_timeout), controlCallback));
 
     executor = rclc_executor_get_zero_initialized_executor();
-    RCCHECK(rclc_executor_init(&executor, &support.context, 3, &allocator));    // max handles = 7
+    RCCHECK(rclc_executor_init(&executor, &support.context, 3, &allocator));    // max handles = 3
 
     RCCHECK(rclc_executor_add_subscription(
-        &executor, &motor_subscriber, &motor_msg, &twistCallback, ON_NEW_DATA));
+        &executor, &spin_subscriber, &spin_msg, &twistCallback, ON_NEW_DATA));
 
     RCCHECK(rclc_executor_add_timer(&executor, &control_timer));
     syncTime();
@@ -173,8 +188,8 @@ bool destroyEntities()      // destroy ROS entities
     // rmw_context_t *rmw_context = rcl_context_get_rmw_context(&support.context);
     // (void)rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
 
-    rcl_publisher_fini(&debug_motor_publisher, &node);
-    rcl_subscription_fini(&motor_subscriber, &node);
+    rcl_publisher_fini(&debug_spin_publisher, &node);
+    rcl_subscription_fini(&spin_subscriber, &node);
     rcl_node_fini(&node);
     rcl_timer_fini(&control_timer);
     rclc_executor_fini(&executor);
@@ -183,117 +198,38 @@ bool destroyEntities()      // destroy ROS entities
     return true;
 }
 
-void Move()
+void Spin()
 {
-    float WHEEL_RADIUS = WHEEL_DIAMETER/2;
+    float z = spin_msg.angular.z;
 
-    // from geometry_msgs/Twist
-    float Vx = motor_msg.linear.x;   // m/s
-    float Wz = motor_msg.angular.z;  // rad/s
+    // Decide direction
+    int dir = 0;
+    if (z > TWIST_THRESH) dir = 1;
+    else if (z < -TWIST_THRESH) dir = -1;
+    else if (fabs(z) < TWIST_DEADZONE) dir = 0; // neutral
 
-    // Kinematics for differntial
-    float wheel_left = Vx - (Wz * LR_WHEELS_DISTANCE * 0.5f);
-    float wheel_right = Vx + (Wz * LR_WHEELS_DISTANCE * 0.5f);
-
-    // m/s to rpm
-    float wheel1_rpm = (wheel_left / (0.2 * M_PI * WHEEL_RADIUS)) * 60.0f; // front left
-    float wheel2_rpm = (wheel_right / (0.2 * M_PI * WHEEL_RADIUS)) * 60.0f; // front right
-    float wheel3_rpm = (wheel_left / (0.2 * M_PI * WHEEL_RADIUS)) * 60.0f; // rear left
-    float wheel4_rpm = (wheel_right / (0.2 * M_PI * WHEEL_RADIUS)) * 60.0f; // rear right
-
-    // Clamp RPM to max allowed
-    float max_rpm_allowed = MOTOR_MAX_RPM * MAX_RPM_RATIO;
-    wheel1_rpm = constrain(wheel1_rpm, -max_rpm_allowed, max_rpm_allowed);
-    wheel2_rpm = constrain(wheel2_rpm, -max_rpm_allowed, max_rpm_allowed);
-    wheel3_rpm = constrain(wheel3_rpm, -max_rpm_allowed, max_rpm_allowed);
-    wheel4_rpm = constrain(wheel4_rpm, -max_rpm_allowed, max_rpm_allowed);
-
-    // Convert RPM to PWM duty cycle
-    int pwm1 = (int)((fabs(wheel1_rpm) / MOTOR_MAX_RPM) * PWM_Max);
-    int pwm2 = (int)((fabs(wheel2_rpm) / MOTOR_MAX_RPM) * PWM_Max);
-    int pwm3 = (int)((fabs(wheel3_rpm) / MOTOR_MAX_RPM) * PWM_Max);
-    int pwm4 = (int)((fabs(wheel4_rpm) / MOTOR_MAX_RPM) * PWM_Max);
-
-    // Set motor directions and apply PWM
-    if (wheel1_rpm > 0)     // wheel 1
-    {
-        digitalWrite(MOTOR1_IN_B, HIGH ^ MOTOR1_INV);
-        ledcWrite(0, pwm1);
-    }
-    else if (wheel1_rpm < 0)
-    {
-        digitalWrite(MOTOR1_IN_B, LOW ^ MOTOR1_INV);
-        ledcWrite(0, pwm1);
-    }
-    else
-    {
-        digitalWrite(MOTOR1_IN_B, LOW);
-        ledcWrite(0, 0);
+    // Edge detection: only queue once when going from neutral to a side,
+    // or crossing from one side directly to the other.
+    if (dir != 0 && dir != last_dir) {
+        long delta = (dir > 0) ? +STEPS_PER_36 : -STEPS_PER_36;
+        remaining_steps += delta;
     }
 
-    if (wheel2_rpm > 0)     // wheel 2
-    {
-        digitalWrite(MOTOR2_IN_B, HIGH ^ MOTOR2_INV);
-        ledcWrite(0, pwm2);
-    }
-    else if (wheel2_rpm < 0)
-    {
-        digitalWrite(MOTOR2_IN_B, LOW ^ MOTOR2_INV);
-        ledcWrite(0, pwm2);
-    }
-    else
-    {
-        digitalWrite(MOTOR2_IN_B, LOW);
-        ledcWrite(0, 0);
-    }
-    
-    if (wheel3_rpm > 0)     // wheel 3
-    {
-        digitalWrite(MOTOR3_IN_B, HIGH ^ MOTOR3_INV);
-        ledcWrite(0, pwm3);
-    }
-    else if (wheel3_rpm < 0)
-    {
-        digitalWrite(MOTOR3_IN_B, LOW ^ MOTOR3_INV);
-        ledcWrite(0, pwm3);
-    }
-    else
-    {
-        digitalWrite(MOTOR3_IN_B, LOW);
-        ledcWrite(0, 0);
+    // Reset edge detection when neutral
+    if (dir == 0 && last_dir != 0) {
+        last_dir = 0;
+    } else if (dir != 0) {
+        last_dir = dir;
     }
 
-    if (wheel4_rpm > 0)     // wheel 4
-    {
-        digitalWrite(MOTOR4_IN_B, HIGH ^ MOTOR4_INV);
-        ledcWrite(0, pwm4);
-    }
-    else if (wheel4_rpm < 0)
-    {
-        digitalWrite(MOTOR4_IN_B, LOW ^ MOTOR4_INV);
-        ledcWrite(0, pwm4);
-    }
-    else
-    {
-        digitalWrite(MOTOR4_IN_B, LOW);
-        ledcWrite(0, 0);
-    }
-
-    debug_motor_msg.linear.y = wheel1_rpm;   // front left
-    debug_motor_msg.linear.z = wheel2_rpm;   // front right
-    debug_motor_msg.angular.x = wheel3_rpm;  // rear left
-    debug_motor_msg.angular.y = wheel4_rpm;  // rear right
-
-
+    debug_spin_msg.linear.x = (float)remaining_steps;       // remaining steps
 }
 
 void publishData()
 {
-    debug_motor_msg.linear.x = motor_msg.linear.x;   // m/s
-    debug_motor_msg.angular.z = motor_msg.angular.z; // rad/s
+    debug_spin_msg.angular.z = spin_msg.angular.z;
 
-
-    rcl_publish(&debug_motor_publisher, &debug_motor_msg, NULL);
+    rcl_publish(&debug_spin_publisher, &debug_spin_msg, NULL);
 }
 
 void syncTime()

@@ -57,6 +57,7 @@ class Gamepad:
         if self.button_triangle and not self.previous_triangle_state:
             self.drill = not self.drill
             if self.drill:
+                self.spin = False
                 self.last_macro_button = 'drill'
             else:
                 self.last_macro_button = None
@@ -66,6 +67,7 @@ class Gamepad:
         if self.button_circle and not self.previous_circle_state:
             self.spinupdate_spin = not self.spin
             if self.spin:
+                self.drill = False
                 self.last_macro_button = 'spin'
             else:
                 self.last_macro_button = None
@@ -91,7 +93,7 @@ class Joystick(Node):
         self.pub_move = self.create_publisher(
             Twist, "/quin/cmd_move", qos_profile=qos.qos_profile_system_default
         )
-        
+
         self.pub_macro = self.create_publisher(
             Twist, "/quin/cmd_macro", qos_profile=qos.qos_profile_system_default
         )
@@ -171,7 +173,7 @@ class Joystick(Node):
             cmd_vel_macro.linear.x = 1.0
 
         if self.gamepad.last_macro_button == 'spin' and self.gamepad.spin:
-            cmd_vel_macro.linear.y = 1.0
+            cmd_vel_macro.linear.z = 1.0
 
         if self.gamepad.toggle_encoder_bool:
             cmd_encoder.linear.x = 2.0 #RPM

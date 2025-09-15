@@ -58,6 +58,8 @@ def generate_launch_description():
     )
 >>>>>>> 63150ec (move)
     
+    
+    
     # joy_auto = Node(
     #     package="quin_core",
     #     executable="joystick_control_3sec.py",
