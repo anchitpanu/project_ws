@@ -21,10 +21,10 @@ def generate_launch_description():
     )
     
     
-    cmd_vel_auto_aim = Node(
+    cmd_move = Node(
         package="quin_core",
-        executable="cmd_vel_auto_aim.py",
-        name="Cmd_Vel_Auto_Aim",
+        executable="cmd_move.py",
+        name="Cmd_Move",
         # output="screen",
         namespace="",
         # parameters=[], #Testing
@@ -67,7 +67,7 @@ def generate_launch_description():
 
     # Add actions to the launch description
     ld.add_action(microros_launch)
-    ld.add_action(cmd_vel_auto_aim)
+    ld.add_action(cmd_move)
     ld.add_action(camera_driver)
     ld.add_action(apriltag_auto_aim)
     # ld.add_action(hoop_detection)

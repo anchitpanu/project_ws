@@ -1,0 +1,54 @@
+[0.014s] Invoking command in '/home/earn/project_ws/quin_ws/build/quin_core': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy:/home/earn/ktp_ws/install/my_robot_controller:/home/earn/ros2_ws/install/py_srvcli:/home/earn/ros2_ws/install/py_pubsub:/home/earn/ros2_ws/install/my_robot_controller:/home/earn/turtlebot3_ws/install/turtlebot3_teleop:/home/earn/turtlebot3_ws/install/turtlebot3_example DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/earn/project_ws/quin_ws/build/quin_core -- -j12 -l12
+[0.066s] Built target ament_cmake_python_copy_quin_core
+[0.235s] running egg_info
+[0.251s] writing quin_core.egg-info/PKG-INFO
+[0.251s] writing dependency_links to quin_core.egg-info/dependency_links.txt
+[0.251s] writing top-level names to quin_core.egg-info/top_level.txt
+[0.295s] reading manifest file 'quin_core.egg-info/SOURCES.txt'
+[0.295s] writing manifest file 'quin_core.egg-info/SOURCES.txt'
+[0.322s] Built target ament_cmake_python_build_quin_core_egg
+[0.332s] Invoked command in '/home/earn/project_ws/quin_ws/build/quin_core' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy:/home/earn/ktp_ws/install/my_robot_controller:/home/earn/ros2_ws/install/py_srvcli:/home/earn/ros2_ws/install/py_pubsub:/home/earn/ros2_ws/install/my_robot_controller:/home/earn/turtlebot3_ws/install/turtlebot3_teleop:/home/earn/turtlebot3_ws/install/turtlebot3_example DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/earn/project_ws/quin_ws/build/quin_core -- -j12 -l12
+[0.340s] Invoking command in '/home/earn/project_ws/quin_ws/build/quin_core': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy:/home/earn/ktp_ws/install/my_robot_controller:/home/earn/ros2_ws/install/py_srvcli:/home/earn/ros2_ws/install/py_pubsub:/home/earn/ros2_ws/install/my_robot_controller:/home/earn/turtlebot3_ws/install/turtlebot3_teleop:/home/earn/turtlebot3_ws/install/turtlebot3_example DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/earn/project_ws/quin_ws/build/quin_core
+[0.346s] -- Install configuration: ""
+[0.347s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/launch
+[0.347s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/launch/bot_bringup.launch.py
+[0.347s] -- Installing: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/launch/joystickController.launch.py
+[0.347s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/launch/microros.launch.py
+[0.347s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/scripts
+[0.347s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/joystick_control.py
+[0.347s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/cmd_move
+[0.347s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/joystick_control
+[0.347s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/scripts/cmd_move.py
+[0.348s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/config
+[0.348s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/config/motor_config.yaml
+[0.348s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/config/locations.yaml
+[0.348s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/environment/pythonpath.sh
+[0.348s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/environment/pythonpath.dsv
+[0.348s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info
+[0.348s] -- Installing: /home/earn/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/top_level.txt
+[0.348s] -- Installing: /home/earn/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/SOURCES.txt
+[0.348s] -- Installing: /home/earn/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/dependency_links.txt
+[0.348s] -- Installing: /home/earn/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info/PKG-INFO
+[0.348s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core
+[0.348s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core/__init__.py
+[0.377s] Listing '/home/earn/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core'...
+[0.381s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/lib/quin_core/joystick_control.py
+[0.381s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/lib/quin_core/cmd_move.py
+[0.381s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/lib/quin_core/src/controller.py
+[0.381s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/lib/quin_core/src/utilize.py
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/ament_index/resource_index/package_run_dependencies/quin_core
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/ament_index/resource_index/parent_prefix_path/quin_core
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/environment/ament_prefix_path.sh
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/environment/ament_prefix_path.dsv
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/environment/path.sh
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/environment/path.dsv
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.bash
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.sh
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.zsh
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/local_setup.dsv
+[0.382s] -- Installing: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/package.dsv
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/ament_index/resource_index/packages/quin_core
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/cmake/quin_coreConfig.cmake
+[0.382s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/cmake/quin_coreConfig-version.cmake
+[0.383s] -- Up-to-date: /home/earn/project_ws/quin_ws/install/quin_core/share/quin_core/package.xml
+[0.385s] Invoked command in '/home/earn/project_ws/quin_ws/build/quin_core' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy:/home/earn/ktp_ws/install/my_robot_controller:/home/earn/ros2_ws/install/py_srvcli:/home/earn/ros2_ws/install/py_pubsub:/home/earn/ros2_ws/install/my_robot_controller:/home/earn/turtlebot3_ws/install/turtlebot3_teleop:/home/earn/turtlebot3_ws/install/turtlebot3_example DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/earn/project_ws/quin_ws/build/quin_core

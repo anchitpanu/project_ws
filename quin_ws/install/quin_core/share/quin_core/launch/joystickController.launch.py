@@ -24,8 +24,6 @@ def generate_launch_description():
         name="Joy_Node",
         # output="screen",
         namespace="",
-        # parameters=[{"autorepeat_rate": 50.0}],
-        # arguments=["--dev", "/dev/input/js0"],  # replace with your joystick device path
         remappings = [
             ('/joy', '/quin/joy')
         ]
@@ -40,14 +38,14 @@ def generate_launch_description():
     )
     
     
-    cmd_vel_to_motor_speed = Node(
-        package="quin_core",
-        executable="cmd_move",
-        name="Cmd_Vel_To_Rpm",
-        # output="screen",
-        namespace="",
-        # parameters=[motor_config], #Testing
-    )
+    # cmd_vel_to_motor_speed = Node(
+    #     package="quin_core",
+    #     executable="cmd_move",
+    #     name="Cmd_Vel_To_Rpm",
+    #     # output="screen",
+    #     namespace="",
+    #     # parameters=[motor_config], #Testing
+    # )
     
     # joy_auto = Node(
     #     package="quin_core",

@@ -19,12 +19,12 @@
   <depend>std_msgs</depend>  <!-- Add std_msgs for Float32 messages -->
 
   <!-- Camera Node Dependencies -->
-  <depend>cv_bridge</depend>
+  <!-- <depend>cv_bridge</depend>
   <depend>image_transport</depend>
-  <depend>tensorflow-lite</depend>
+  <depend>tensorflow-lite</depend> -->
 
   <!-- Python Dependencies -->
-  <depend>tf-transformations</depend>
+  <depend>tf_transformations</depend>
   <depend>python3-matplotlib</depend>  <!-- Add matplotlib dependency -->
 
   <export>

@@ -1,1 +1,1 @@
-cv_bridge:geometry_msgs:image_transport:python3-matplotlib:rclcpp:rclpy:sensor_msgs:std_msgs:tensorflow-lite:tf-transformations
+geometry_msgs:python3-matplotlib:rclcpp:rclpy:sensor_msgs:std_msgs:tf_transformations

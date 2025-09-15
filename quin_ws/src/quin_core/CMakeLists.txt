@@ -62,7 +62,7 @@ install(PROGRAMS
   # scripts/apriltag_distance.py
   # scripts/both_detect.py
   
-  scripts/joystick_control
+  scripts/joystick_control.py
   scripts/cmd_move.py
 
   #scripts_camera/cameracapture.py

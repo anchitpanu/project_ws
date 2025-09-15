@@ -1,8 +1,8 @@
-# Install script for directory: /home/quin/project_ws/quin_ws/src/quin_core
+# Install script for directory: /home/earn/project_ws/quin_ws/src/quin_core
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/quin/project_ws/quin_ws/install/quin_core")
+  set(CMAKE_INSTALL_PREFIX "/home/earn/project_ws/quin_ws/install/quin_core")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -44,56 +44,56 @@ endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE DIRECTORY FILES
-    "/home/quin/project_ws/quin_ws/src/quin_core/launch"
-    "/home/quin/project_ws/quin_ws/src/quin_core/scripts"
-    "/home/quin/project_ws/quin_ws/src/quin_core/config"
+    "/home/earn/project_ws/quin_ws/src/quin_core/launch"
+    "/home/earn/project_ws/quin_ws/src/quin_core/scripts"
+    "/home/earn/project_ws/quin_ws/src/quin_core/config"
     )
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core/environment" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/pythonpath.sh")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core/environment" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/pythonpath.sh")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core/environment" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/pythonpath.dsv")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core/environment" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/pythonpath.dsv")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info" TYPE DIRECTORY FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_python/quin_core/quin_core.egg-info/")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python3.12/site-packages/quin_core-2.1.5-py3.12.egg-info" TYPE DIRECTORY FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_python/quin_core/quin_core.egg-info/")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python3.12/site-packages/quin_core" TYPE DIRECTORY FILES "/home/quin/project_ws/quin_ws/src/quin_core/quin_core/" REGEX "/[^/]*\\.pyc$" EXCLUDE REGEX "/\\_\\_pycache\\_\\_$" EXCLUDE)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python3.12/site-packages/quin_core" TYPE DIRECTORY FILES "/home/earn/project_ws/quin_ws/src/quin_core/quin_core/" REGEX "/[^/]*\\.pyc$" EXCLUDE REGEX "/\\_\\_pycache\\_\\_$" EXCLUDE)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   execute_process(
         COMMAND
         "/usr/bin/python3" "-m" "compileall"
-        "/home/quin/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core"
+        "/home/earn/project_ws/quin_ws/install/quin_core/lib/python3.12/site-packages/quin_core"
       )
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/quin_core" TYPE PROGRAM FILES
-    "/home/quin/project_ws/quin_ws/src/quin_core/scripts/joystick_control"
-    "/home/quin/project_ws/quin_ws/src/quin_core/scripts/cmd_move.py"
+    "/home/earn/project_ws/quin_ws/src/quin_core/scripts/joystick_control.py"
+    "/home/earn/project_ws/quin_ws/src/quin_core/scripts/cmd_move.py"
     )
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/quin_core/src" TYPE PROGRAM FILES
-    "/home/quin/project_ws/quin_ws/src/quin_core/src/controller.py"
-    "/home/quin/project_ws/quin_ws/src/quin_core/src/utilize.py"
+    "/home/earn/project_ws/quin_ws/src/quin_core/src/controller.py"
+    "/home/earn/project_ws/quin_ws/src/quin_core/src/utilize.py"
     )
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/package_run_dependencies" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/quin_core")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/package_run_dependencies" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/quin_core")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/parent_prefix_path" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_index/share/ament_index/resource_index/parent_prefix_path/quin_core")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/parent_prefix_path" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_index/share/ament_index/resource_index/parent_prefix_path/quin_core")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -101,7 +101,7 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core/environment" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/ament_prefix_path.dsv")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core/environment" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/ament_prefix_path.dsv")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -109,42 +109,42 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core/environment" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/path.dsv")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core/environment" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/path.dsv")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/local_setup.bash")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/local_setup.bash")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/local_setup.sh")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/local_setup.sh")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/local_setup.zsh")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/local_setup.zsh")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/local_setup.dsv")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/local_setup.dsv")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/package.dsv")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_environment_hooks/package.dsv")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/packages" TYPE FILE FILES "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_index/share/ament_index/resource_index/packages/quin_core")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/packages" TYPE FILE FILES "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_index/share/ament_index/resource_index/packages/quin_core")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core/cmake" TYPE FILE FILES
-    "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_core/quin_coreConfig.cmake"
-    "/home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_core/quin_coreConfig-version.cmake"
+    "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_core/quin_coreConfig.cmake"
+    "/home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_core/quin_coreConfig-version.cmake"
     )
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/quin/project_ws/quin_ws/src/quin_core/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/quin_core" TYPE FILE FILES "/home/earn/project_ws/quin_ws/src/quin_core/package.xml")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -155,5 +155,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/quin/project_ws/quin_ws/build/quin_core/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/earn/project_ws/quin_ws/build/quin_core/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/quin/project_ws/quin_ws/src/quin_core
+CMAKE_SOURCE_DIR = /home/earn/project_ws/quin_ws/src/quin_core
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/quin/project_ws/quin_ws/build/quin_core
+CMAKE_BINARY_DIR = /home/earn/project_ws/quin_ws/build/quin_core
 
 # Utility rule file for quin_core_uninstall.
 
@@ -67,7 +67,7 @@ include CMakeFiles/quin_core_uninstall.dir/compiler_depend.make
 include CMakeFiles/quin_core_uninstall.dir/progress.make
 
 CMakeFiles/quin_core_uninstall:
-	/usr/bin/cmake -P /home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_uninstall_target/ament_cmake_uninstall_target.cmake
+	/usr/bin/cmake -P /home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_uninstall_target/ament_cmake_uninstall_target.cmake
 
 quin_core_uninstall: CMakeFiles/quin_core_uninstall
 quin_core_uninstall: CMakeFiles/quin_core_uninstall.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/quin_core_uninstall.dir/clean:
 .PHONY : CMakeFiles/quin_core_uninstall.dir/clean
 
 CMakeFiles/quin_core_uninstall.dir/depend:
-	cd /home/quin/project_ws/quin_ws/build/quin_core && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/quin/project_ws/quin_ws/src/quin_core /home/quin/project_ws/quin_ws/src/quin_core /home/quin/project_ws/quin_ws/build/quin_core /home/quin/project_ws/quin_ws/build/quin_core /home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/quin_core_uninstall.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/earn/project_ws/quin_ws/build/quin_core && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/earn/project_ws/quin_ws/src/quin_core /home/earn/project_ws/quin_ws/src/quin_core /home/earn/project_ws/quin_ws/build/quin_core /home/earn/project_ws/quin_ws/build/quin_core /home/earn/project_ws/quin_ws/build/quin_core/CMakeFiles/quin_core_uninstall.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/quin_core_uninstall.dir/depend
 

@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/quin/project_ws/quin_ws/src/quin_core
+CMAKE_SOURCE_DIR = /home/earn/project_ws/quin_ws/src/quin_core
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/quin/project_ws/quin_ws/build/quin_core
+CMAKE_BINARY_DIR = /home/earn/project_ws/quin_ws/build/quin_core
 
 # Utility rule file for ament_cmake_python_copy_quin_core.
 
@@ -67,7 +67,7 @@ include CMakeFiles/ament_cmake_python_copy_quin_core.dir/compiler_depend.make
 include CMakeFiles/ament_cmake_python_copy_quin_core.dir/progress.make
 
 CMakeFiles/ament_cmake_python_copy_quin_core:
-	/usr/bin/cmake -E copy_directory /home/quin/project_ws/quin_ws/src/quin_core/quin_core /home/quin/project_ws/quin_ws/build/quin_core/ament_cmake_python/quin_core/quin_core
+	/usr/bin/cmake -E copy_directory /home/earn/project_ws/quin_ws/src/quin_core/quin_core /home/earn/project_ws/quin_ws/build/quin_core/ament_cmake_python/quin_core/quin_core
 
 ament_cmake_python_copy_quin_core: CMakeFiles/ament_cmake_python_copy_quin_core
 ament_cmake_python_copy_quin_core: CMakeFiles/ament_cmake_python_copy_quin_core.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/ament_cmake_python_copy_quin_core.dir/clean:
 .PHONY : CMakeFiles/ament_cmake_python_copy_quin_core.dir/clean
 
 CMakeFiles/ament_cmake_python_copy_quin_core.dir/depend:
-	cd /home/quin/project_ws/quin_ws/build/quin_core && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/quin/project_ws/quin_ws/src/quin_core /home/quin/project_ws/quin_ws/src/quin_core /home/quin/project_ws/quin_ws/build/quin_core /home/quin/project_ws/quin_ws/build/quin_core /home/quin/project_ws/quin_ws/build/quin_core/CMakeFiles/ament_cmake_python_copy_quin_core.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/earn/project_ws/quin_ws/build/quin_core && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/earn/project_ws/quin_ws/src/quin_core /home/earn/project_ws/quin_ws/src/quin_core /home/earn/project_ws/quin_ws/build/quin_core /home/earn/project_ws/quin_ws/build/quin_core /home/earn/project_ws/quin_ws/build/quin_core/CMakeFiles/ament_cmake_python_copy_quin_core.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/ament_cmake_python_copy_quin_core.dir/depend
 
