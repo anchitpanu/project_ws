@@ -4,8 +4,8 @@
 /*
 ROBOT ORIENTATION
          FRONT
-    MOTOR1  MOTOR3  
-    MOTOR2  MOTOR4  (4WD/DIFFERENTIAL)
+    MOTOR1  MOTOR2 
+    MOTOR3  MOTOR4  (4WD/DIFFERENTIAL)
          BACK
 */
 
@@ -40,10 +40,10 @@ ROBOT ORIENTATION
 #define PWM_Min -PWM_Max
 
 // INVERT MOTOR DIRECTIONS
-#define MOTOR1_INV false
+#define MOTOR1_INV true
 #define MOTOR2_INV true
-#define MOTOR3_INV true
-#define MOTOR4_INV false
+#define MOTOR3_INV false
+#define MOTOR4_INV true
 
 //  Motor Brake
 #define MOTOR1_BRAKE true
@@ -53,18 +53,18 @@ ROBOT ORIENTATION
 
 // Motor 1 Parameters
 // #define MOTOR1_PWM  0
-#define MOTOR1_IN_A 35
+#define MOTOR1_IN_A 14
 #define MOTOR1_IN_B 32
 
 // Motor 2 Parameters
 // #define MOTOR2_PWM  3
-#define MOTOR2_IN_A 33
-#define MOTOR2_IN_B 25
+#define MOTOR2_IN_A 19
+#define MOTOR2_IN_B 18
 
 // Motor 3 Parameters
 // #define MOTOR3_PWM  6
-#define MOTOR3_IN_A 19
-#define MOTOR3_IN_B 18
+#define MOTOR3_IN_A 33
+#define MOTOR3_IN_B 25
 
 // Motor 4 Parameters
 // #define MOTOR4_PWM  9

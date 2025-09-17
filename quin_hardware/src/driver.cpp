@@ -217,64 +217,76 @@ void Move()
     // Set motor directions and apply PWM
     if (wheel1_rpm > 0)     // wheel 1
     {
-        digitalWrite(MOTOR1_IN_B, HIGH ^ MOTOR1_INV);
+        digitalWrite(MOTOR1_IN_A, HIGH ^ MOTOR1_INV);
+        digitalWrite(MOTOR1_IN_B, LOW ^ MOTOR1_INV);
         ledcWrite(0, pwm1);
     }
     else if (wheel1_rpm < 0)
     {
-        digitalWrite(MOTOR1_IN_B, LOW ^ MOTOR1_INV);
+        digitalWrite(MOTOR1_IN_A, LOW ^ MOTOR1_INV);
+        digitalWrite(MOTOR1_IN_B, HIGH ^ MOTOR1_INV);
         ledcWrite(0, pwm1);
     }
     else
     {
+        digitalWrite(MOTOR1_IN_A, LOW);
         digitalWrite(MOTOR1_IN_B, LOW);
         ledcWrite(0, 0);
     }
 
     if (wheel2_rpm > 0)     // wheel 2
     {
-        digitalWrite(MOTOR2_IN_B, HIGH ^ MOTOR2_INV);
+        digitalWrite(MOTOR2_IN_A, HIGH ^ MOTOR2_INV);
+        digitalWrite(MOTOR2_IN_B, LOW ^ MOTOR2_INV);
         ledcWrite(0, pwm2);
     }
     else if (wheel2_rpm < 0)
     {
-        digitalWrite(MOTOR2_IN_B, LOW ^ MOTOR2_INV);
+        digitalWrite(MOTOR2_IN_A, LOW ^ MOTOR2_INV);
+        digitalWrite(MOTOR2_IN_B, HIGH ^ MOTOR2_INV);
         ledcWrite(0, pwm2);
     }
     else
     {
+        digitalWrite(MOTOR2_IN_A, LOW);
         digitalWrite(MOTOR2_IN_B, LOW);
         ledcWrite(0, 0);
     }
     
     if (wheel3_rpm > 0)     // wheel 3
     {
-        digitalWrite(MOTOR3_IN_B, HIGH ^ MOTOR3_INV);
+        digitalWrite(MOTOR3_IN_A, HIGH ^ MOTOR3_INV);
+        digitalWrite(MOTOR3_IN_B, LOW ^ MOTOR3_INV);
         ledcWrite(0, pwm3);
     }
     else if (wheel3_rpm < 0)
     {
-        digitalWrite(MOTOR3_IN_B, LOW ^ MOTOR3_INV);
+        digitalWrite(MOTOR3_IN_A, LOW ^ MOTOR3_INV);
+        digitalWrite(MOTOR3_IN_B, HIGH ^ MOTOR3_INV);
         ledcWrite(0, pwm3);
     }
     else
     {
+        digitalWrite(MOTOR3_IN_A, LOW);
         digitalWrite(MOTOR3_IN_B, LOW);
         ledcWrite(0, 0);
     }
 
     if (wheel4_rpm > 0)     // wheel 4
     {
-        digitalWrite(MOTOR4_IN_B, HIGH ^ MOTOR4_INV);
+        digitalWrite(MOTOR4_IN_A, HIGH ^ MOTOR4_INV);
+        digitalWrite(MOTOR4_IN_B, LOW ^ MOTOR4_INV);
         ledcWrite(0, pwm4);
     }
     else if (wheel4_rpm < 0)
     {
-        digitalWrite(MOTOR4_IN_B, LOW ^ MOTOR4_INV);
+        digitalWrite(MOTOR4_IN_A, LOW ^ MOTOR4_INV);
+        digitalWrite(MOTOR4_IN_B, HIGH ^ MOTOR4_INV);
         ledcWrite(0, pwm4);
     }
     else
     {
+        digitalWrite(MOTOR4_IN_A, LOW);
         digitalWrite(MOTOR4_IN_B, LOW);
         ledcWrite(0, 0);
     }

@@ -80,9 +80,11 @@ void setup()
     Serial.begin(115200);
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
 
-    myStepper.setSpeed(STEPPER_RPM);
+    // Stepper pins
+    pinMode(STEPPER_PIN_EN, OUTPUT);
+    digitalWrite(STEPPER_PIN_EN, LOW);        // enable (LOW ส่วนใหญ่)
 
-    state = WAITING_AGENT;
+    myStepper.setSpeed(SPEED_RPM);
 }
 
 void loop() {
@@ -117,21 +119,6 @@ void controlCallback(rcl_timer_t *timer, int64_t last_call_time)
     if (timer != NULL)
     {
         Spin();
-
-        long todo = remaining_steps;
-        if (todo != 0) {
-            int chunk = STEP_CHUNK_PER_TICK;
-            if (abs(todo) < chunk) chunk = abs(todo);
-
-            if (todo > 0) {
-            myStepper.step(chunk);
-            remaining_steps -= chunk;
-            } else {
-            myStepper.step(-chunk);
-            remaining_steps += chunk;
-            }
-        }
-
         publishData();
     }
 }
@@ -164,7 +151,7 @@ bool createEntities()       // create ROS entities
     RCCHECK(rclc_subscription_init_best_effort(
         &spin_subscriber, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-        "/quin/cmd_macro"));
+        "/quin/cmd_spin"));
 
     const unsigned int control_timeout = 20;
     RCCHECK(rclc_timer_init_default(
@@ -214,12 +201,14 @@ void Spin()
         long delta = (dir > 0) ? +STEPS_PER_36 : -STEPS_PER_36;
         remaining_steps += delta;
     }
+    last_dir = dir;
 
-    // Reset edge detection when neutral
-    if (dir == 0 && last_dir != 0) {
-        last_dir = 0;
-    } else if (dir != 0) {
-        last_dir = dir;
+    int steps_this_tick = 0;
+    while (remaining_steps != 0 && steps_this_tick < MAX_STEPS_PER_TICK) {
+        int step_dir = (remaining_steps > 0) ? +1 : -1;
+        myStepper.step(step_dir);   // เดิน 1 สเต็ป
+        remaining_steps -= step_dir;
+        steps_this_tick++;
     }
 
     debug_spin_msg.linear.x = (float)remaining_steps;       // remaining steps

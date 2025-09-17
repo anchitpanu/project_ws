@@ -41,14 +41,15 @@ class Gamepad:
         
         self.drill: bool = False
         self.spin: bool = False
+        self.spinback: bool = False
         self.toggle_encoder_bool : bool = False
 
         self.previous_triangle_state = False
+        self.previous_circle_state = False
+        self.previous_square_state = False
         self.previous_l1_state = False
         self.previous_r1_state = False
         self.previous_PressedRightAnalog_state = False
-
-
 
         self.last_macro_button = None  # Stores 'drill' 'spin'
 
@@ -58,6 +59,7 @@ class Gamepad:
             self.drill = not self.drill
             if self.drill:
                 self.spin = False
+                self.spinback = False
                 self.last_macro_button = 'drill'
             else:
                 self.last_macro_button = None
@@ -65,13 +67,25 @@ class Gamepad:
 
     def update_spin(self):
         if self.button_circle and not self.previous_circle_state:
-            self.spinupdate_spin = not self.spin
+            self.spin = not self.spin
             if self.spin:
                 self.drill = False
+                self.spinback = False
                 self.last_macro_button = 'spin'
             else:
                 self.last_macro_button = None
         self.previous_circle_state = self.button_circle
+
+    def update_spinback(self):
+        if self.button_square and not self.previous_square_state:
+            self.spinback = not self.spinback
+            if self.spinback:
+                self.drill = False
+                self.spin = False
+                self.last_macro_button = 'spinback'
+            else:
+                self.last_macro_button = None
+        self.previous_square_state = self.button_square
 
     def update_toggle_encoder(self):
         if self.PressedRightAnalog and not self.previous_PressedRightAnalog_state:
@@ -82,6 +96,7 @@ class Gamepad:
     def reset_toggles(self):
         self.drill = False
         self.spin = False 
+        self.spinback = False
         self.last_macro_button = None
         
 
@@ -94,8 +109,8 @@ class Joystick(Node):
             Twist, "/quin/cmd_move", qos_profile=qos.qos_profile_system_default
         )
 
-        self.pub_macro = self.create_publisher(
-            Twist, "/quin/cmd_macro", qos_profile=qos.qos_profile_system_default
+        self.pub_spin = self.create_publisher(
+            Twist, "/quin/cmd_spin", qos_profile=qos.qos_profile_system_default
         )
 
         self.pub_encoder = self.create_publisher(
@@ -147,6 +162,7 @@ class Joystick(Node):
         
         self.gamepad.update_drill()
         self.gamepad.update_spin()
+        self.gamepad.update_spinback()
         self.gamepad.update_toggle_encoder()
     
         
@@ -160,20 +176,24 @@ class Joystick(Node):
     def sendData(self):
         
         cmd_vel_move = Twist()
-        cmd_vel_macro = Twist()
         cmd_encoder = Twist()
-
 
         cmd_vel_move.linear.x = float(self.gamepad.ly * self.maxspeed)
         cmd_vel_move.angular.z = float(self.gamepad.rx * self.maxspeed)
 
-           
+        # spin command: -1/0/+1 on angular.z
+        cmd_spin = Twist()
 
-        if self.gamepad.last_macro_button == 'drill' and self.gamepad.drill:
-            cmd_vel_macro.linear.x = 1.0
+        if self.gamepad.spin and not self.gamepad.spinback:
+            cmd_spin.angular.z = +1.0         # Circle: clockwise
 
-        if self.gamepad.last_macro_button == 'spin' and self.gamepad.spin:
-            cmd_vel_macro.linear.z = 1.0
+        elif self.gamepad.spinback and not self.gamepad.spin:
+            cmd_spin.angular.z = -1.0         # Square: counter-clockwise
+
+        else:
+            cmd_spin.angular.z = 0.0          # Stop
+        self.pub_spin.publish(cmd_spin)
+
 
         if self.gamepad.toggle_encoder_bool:
             cmd_encoder.linear.x = 2.0 #RPM
@@ -181,10 +201,7 @@ class Joystick(Node):
             cmd_encoder.linear.x = 1.0 #Bit
         
         self.pub_encoder.publish(cmd_encoder)
-        self.pub_macro.publish(cmd_vel_macro)
         self.pub_move.publish(cmd_vel_move)
-
-
 
 
 def main():

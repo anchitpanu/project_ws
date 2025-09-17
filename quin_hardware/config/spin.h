@@ -1,6 +1,9 @@
 #ifndef SPIN_H
 #define SPIN_H
 
+const float TWIST_THRESH   = 0.2f;   // adjust as needed; velocity threshold to start spinning
+const float TWIST_DEADZONE = 0.05f;
+
 // ULN2003 IN1..IN4 -> ESP32 pins (EDIT to match your wiring)
 #define STEPPER_IN1  8
 #define STEPPER_IN2  10

@@ -6,6 +6,7 @@ from rclpy.node import Node
 from std_msgs.msg import String, Int16MultiArray
 from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Joy
 from rclpy import qos
 from quin_core.utilize import *
 from quin_core.controller import *
@@ -34,6 +35,11 @@ class Cmd_vel_to_motor_speed(Node):
         self.yaw : float = 0
         self.yaw_setpoint = self.yaw
 
+        self.motorspin1Speed: float = 0.0
+
+        self.BTN_CIRCLE = 1
+        self.BTN_SQUARE = 3
+
         # self.previous_manual_turn = time.time()
 
         # self.controller = Controller(kp = 1.0, ki = 0.05, kd = 0.001, baseSpeed = 0.3  ,errorTolerance = To_Radians(0.5), i_min= -1, i_max= 1)
@@ -52,12 +58,12 @@ class Cmd_vel_to_motor_speed(Node):
             Twist, '/quin/cmd_move', self.cmd_move, qos_profile=qos.qos_profile_system_default
         )
 
+        # self.create_subscription(
+        #     Twist, '/quin/cmd_spin', self.cmd_spin, qos_profile=qos.qos_profile_system_default
+        # )
+
         self.create_subscription(
-            Twist, '/quin/cmd_spin', self.cmd_spin, qos_profile=qos.qos_profile_system_default
-        )
-        
-        self.create_subscription(
-            Twist, '/quin/cmd_macro', self.cmd_macro, qos_profile=qos.qos_profile_sensor_data # 10
+            Joy, '/quin/joy', self.cmd_spin, qos_profile=qos.qos_profile_sensor_data
         )
 
         self.create_subscription(
@@ -94,19 +100,37 @@ class Cmd_vel_to_motor_speed(Node):
 
         print(f"Left Motor: {self.motor1Speed:.2f} RPM, Right Motor: {self.motor2Speed:.2f} RPM")
 
-
+    
     def cmd_spin(self, msg):
+        
+        circle = (len(msg.buttons) > self.BTN_CIRCLE and msg.buttons[self.BTN_CIRCLE] == 1)
+        square = (len(msg.buttons) > self.BTN_SQUARE and msg.buttons[self.BTN_SQUARE] == 1)
 
-        if msg.angular.z == 1:
-            self.remaining_steps += 205         # 1 rotation = 205 steps
+        if circle and not square :       # Circle
+            self.motorspin1Speed = 1.0          # Clockwise       
+        
+        elif square and not circle :     # Square
+            self.motorspin1Speed = -1.0         # Counter-Clockwise
 
-        if msg.angular.z == 2:
-            self.remaining_steps -= 205         # 1 rotation = 205 steps
+        else:
+            self.motorspin1Speed = 0.0          # Stop
+
+
+    # def cmd_spin(self, msg):
+
+    #     if msg.angular.z > 0.5:             // Clockwise
+    #         self.motorspin1Speed = 1.0
+
+    #     elif msg.angular.z < -0.5:          // Counter-Clockwise
+    #         self.motorspin1Speed = -1.0
+        
+    #     else:                               // Stop
+    #         self.motorspin1Speed = 0.0
 
 
     def sendData(self):
+
         motorspeed_msg = Twist()
-       
         motorspeed_msg.linear.x = float(self.motor1Speed)
         motorspeed_msg.linear.y = float(self.motor2Speed)
 

@@ -37,8 +37,6 @@ def generate_launch_description():
         namespace="",
     )
     
-    
-<<<<<<< HEAD
     # cmd_vel_to_motor_speed = Node(
     #     package="quin_core",
     #     executable="cmd_move",
@@ -47,7 +45,7 @@ def generate_launch_description():
     #     namespace="",
     #     # parameters=[motor_config], #Testing
     # )
-=======
+
     cmd_vel_to_motor_speed = Node(
         package="quin_core",
         executable="cmd_move.py",
@@ -56,9 +54,7 @@ def generate_launch_description():
         namespace="",
         # parameters=[motor_config], #Testing
     )
->>>>>>> 63150ec (move)
-    
-    
+   
     
     # joy_auto = Node(
     #     package="quin_core",
