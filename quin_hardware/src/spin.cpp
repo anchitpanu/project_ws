@@ -84,7 +84,7 @@ void setup()
     pinMode(STEPPER_PIN_EN, OUTPUT);
     digitalWrite(STEPPER_PIN_EN, LOW);        // enable (LOW ส่วนใหญ่)
 
-    myStepper.setSpeed(SPEED_RPM);
+    myStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
 }
 
 void loop() {

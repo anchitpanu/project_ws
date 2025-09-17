@@ -164,14 +164,17 @@ class Joystick(Node):
         self.gamepad.update_spin()
         self.gamepad.update_spinback()
         self.gamepad.update_toggle_encoder()
+
+        # press=1 release=0
+        # self.gamepad.spin     = bool(self.gamepad.button_circle) 
+        # self.gamepad.spinback = bool(self.gamepad.button_square)   
+
     
         
         if self.gamepad.button_logo:
             self.gamepad.reset_toggles()
 
 
-        
-        
 
     def sendData(self):
         

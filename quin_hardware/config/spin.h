@@ -9,6 +9,7 @@ const float TWIST_DEADZONE = 0.05f;
 #define STEPPER_IN2  10
 #define STEPPER_IN3  9
 #define STEPPER_IN4  11
+#define STEPPER_PIN_EN 12   // enable pin (optional, set to -1 if not used)
 
 // 28BYJ-48: ~2048 steps per 360° (depends on library/gearbox)
 #define STEPS_PER_REV 2048
@@ -19,6 +20,6 @@ const float TWIST_DEADZONE = 0.05f;
 #define STEPPER_RPM   10
 
 // How many steps to perform per control tick (non-blocking chunk)
-#define STEP_CHUNK_PER_TICK  10
+#define MAX_STEPS_PER_TICK  10
 
 #endif
