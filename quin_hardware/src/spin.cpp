@@ -52,7 +52,7 @@ enum states
 
 
 // ---------------- Stepper driver ----------------
-Stepper myStepper(STEPS_PER_REV, STEPPER_IN1, STEPPER_IN3, STEPPER_IN2, STEPPER_IN4);
+Stepper myStepper(STEPS_PER_REV, STEPPER_IN1, STEPPER_IN2);
 
 // Movement queue: remaining steps to execute (positive or negative)
 volatile long remaining_steps = 0;
@@ -81,8 +81,8 @@ void setup()
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
 
     // Stepper pins
-    pinMode(STEPPER_PIN_EN, OUTPUT);
-    digitalWrite(STEPPER_PIN_EN, LOW);        // enable (LOW ส่วนใหญ่)
+    // pinMode(STEPPER_PIN_EN, OUTPUT);
+    // digitalWrite(STEPPER_PIN_EN, LOW);        // enable (LOW ส่วนใหญ่)
 
     myStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
 }
