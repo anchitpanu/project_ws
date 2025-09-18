@@ -27,7 +27,7 @@
 rcl_publisher_t debug_spin_publisher;
 geometry_msgs__msg__Twist debug_spin_msg;
 
-rcl_subscription_t spin_subscriber;        // subscribe /cmd_move
+rcl_subscription_t spin_subscriber;        // subscribe /cmd_spin
 geometry_msgs__msg__Twist spin_msg;
 
 rclc_executor_t executor;
