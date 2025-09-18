@@ -11,7 +11,6 @@
 
 #include <geometry_msgs/msg/twist.h>
 #include <ESP32Encoder.h>
-#include <Stepper.h>
 
 #include "../config/spin.h" 
 
@@ -27,7 +26,7 @@
 rcl_publisher_t debug_spin_publisher;
 geometry_msgs__msg__Twist debug_spin_msg;
 
-rcl_subscription_t spin_subscriber;        // subscribe /cmd_spin
+rcl_subscription_t spin_subscriber;        // subscribe /cmd_move
 geometry_msgs__msg__Twist spin_msg;
 
 rclc_executor_t executor;
@@ -51,21 +50,6 @@ enum states
 } state;
 
 
-// ---------------- Stepper driver ----------------
-<<<<<<< HEAD
-Stepper myStepper(STEPS_PER_REV, STEPPER_IN1, STEPPER_IN2);
-=======
-Stepper myStepper(STEPS_PER_REV, PLS_PIN, DIR_PIN);
->>>>>>> c92d1ca (spin_control)
-
-// Movement queue: remaining steps to execute (positive or negative)
-volatile long remaining_steps = 0;
-
-// Edge-detection state for joystick direction
-// -1 = last was LEFT, 0 = neutral, 1 = RIGHT
-int last_dir = 0;
-
-
 // ------ function list ------
 
 void rclErrorLoop();
@@ -74,7 +58,7 @@ bool createEntities();
 bool destroyEntities();
 void publishData();
 struct timespec getTime();
-void Spin();
+void Move();
 
 // ------ main ------
 
@@ -84,11 +68,9 @@ void setup()
     Serial.begin(115200);
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
 
-    // Stepper pins
-    // pinMode(STEPPER_PIN_EN, OUTPUT);
-    // digitalWrite(STEPPER_PIN_EN, LOW);        // enable (LOW ส่วนใหญ่)
-
-    myStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
+    // Setup motors
+    pinMode(PLS_PIN, OUTPUT);  
+    pinMode(DIR_PIN, OUTPUT);
 }
 
 void loop() {
@@ -193,38 +175,29 @@ void Spin()
 {
     const float z = spin_msg.angular.z;
 
-    if (z > TWIST_THRESH && last_dir != 1) {
-      digitalWrite(DIR_PIN, HIGH);          // press = clockwise 36 degree
-      for (int i = 0; i < STEPS_PER_36; i++) {
+    if (z > TWIST_THRESH) {
+      digitalWrite(DIR_PIN, HIGH);      // clockwise
+      // pulse 1 step
       digitalWrite(PLS_PIN, HIGH);
-      delayMicroseconds(500);               // adjust speed here (lower = faster)
+      delayMicroseconds(3);             // STEP pulse width ~3-5us
       digitalWrite(PLS_PIN, LOW);
-      delayMicroseconds(1000);
-      }
-      last_dir = 1;                         // prevent re-trigger until direction changes
-    } 
-    
-    else if (z < -TWIST_THRESH && last_dir != -1) {
-      digitalWrite(DIR_PIN, LOW);           // press = counter-clockwise 36 degree
-      for (int i = 0; i < STEPS_PER_36; i++) {
-        digitalWrite(PLS_PIN, HIGH);
-        delayMicroseconds(500);
-        digitalWrite(PLS_PIN, LOW);
-        delayMicroseconds(1000);
-      }
-      last_dir = -1;
+    } else if (z < -TWIST_THRESH) {
+      digitalWrite(DIR_PIN, LOW);       // counter-clockwise
+      digitalWrite(PLS_PIN, HIGH);
+      delayMicroseconds(3);
+      digitalWrite(PLS_PIN, LOW);
     }
-    
-    else if (fabs(z) < TWIST_DEADZONE) {
-      last_dir = 0;  // reset edge detection
-    }
+    // z อยู่ใน deadzone -> ไม่ทำอะไร (หยุด)
 
+    // debug เล็กน้อย
     debug_spin_msg.angular.z = z;
 }
 
+
 void publishData()
 {
-    debug_spin_msg.angular.z = spin_msg.angular.z;
+    debug_spin_msg.angular.z = spin_msg.angular.z; // rad/s
+
 
     rcl_publish(&debug_spin_publisher, &debug_spin_msg, NULL);
 }

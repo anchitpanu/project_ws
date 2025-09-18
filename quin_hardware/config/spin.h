@@ -5,11 +5,19 @@ const float TWIST_THRESH   = 0.2f;   // adjust as needed; velocity threshold to 
 const float TWIST_DEADZONE = 0.05f;
 
 // ULN2003 IN1..IN4 -> ESP32 pins (EDIT to match your wiring)
+<<<<<<< HEAD
 #define STEPPER_IN1  17
 #define STEPPER_IN2  16
 // #define STEPPER_IN3  9
 // #define STEPPER_IN4  11
 // #define STEPPER_PIN_EN -1   // enable pin (optional, set to -1 if not used)
+=======
+#define DIR_PIN  17
+#define PLS_PIN  16
+// #define STEPPER_IN3  9
+// #define STEPPER_IN4  11
+// #define STEPPER_PIN_EN 12   // enable pin (optional, set to -1 if not used)
+>>>>>>> c92d1ca (spin_control)
 
 // 28BYJ-48: ~2048 steps per 360° (depends on library/gearbox)
 #define STEPS_PER_REV 2048
