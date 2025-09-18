@@ -197,9 +197,9 @@ void Spin()
       digitalWrite(DIR_PIN, HIGH);          // press = clockwise 36 degree
       for (int i = 0; i < STEPS_PER_36; i++) {
       digitalWrite(PLS_PIN, HIGH);
-      delayMicroseconds(500);               // adjust speed here (lower = faster)
+      delayMicroseconds(STEP_PULSE_HIGH_US);               // adjust speed here (lower = faster)
       digitalWrite(PLS_PIN, LOW);
-      delayMicroseconds(1000);
+      delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
       }
       last_dir = 1;                         // prevent re-trigger until direction changes
     } 
@@ -208,9 +208,9 @@ void Spin()
       digitalWrite(DIR_PIN, LOW);           // press = counter-clockwise 36 degree
       for (int i = 0; i < STEPS_PER_36; i++) {
         digitalWrite(PLS_PIN, HIGH);
-        delayMicroseconds(500);
+        delayMicroseconds(STEP_PULSE_HIGH_US);
         digitalWrite(PLS_PIN, LOW);
-        delayMicroseconds(1000);
+        delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
       }
       last_dir = -1;
     }
