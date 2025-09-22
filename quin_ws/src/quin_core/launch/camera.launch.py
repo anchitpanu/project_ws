@@ -10,29 +10,34 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     camera_driver = Node(
-        package="usb_cam",
-        executable="usb_cam_node_exe",
-        name="camera",
-        output="screen",
+        package='v4l2_camera',
+        executable='v4l2_camera_node',
+        name='camera',
         parameters=[{
-            "video_device": "/dev/video2",
-            "image_size" : [640, 480],              # [width, height]
-            "pixel_format": "yuyv",                # 'raw', 'yuyv', 'mjpeg'
-            "camera_frame_id": "camera_link",
-            "framerate": 30.0,                      # 30 fps
-            "io_method": "userptr",
-            # "camera_info_url": "file:///home/quin/quin_ws/src/quin_core/config/camera_info.yaml"
+            'video_device': '/dev/video0',
+            'camera_name': 'usb_cam',
+            'image_size': [320, 240],
+            'pixel_format': 'YUYV',  
+            'output_encoding': 'yuv422_yuy2',
+            'time_per_frame': [1, 15]  # 30 FPS
         }],
         remappings=[
-            ("/image_raw", "/quin/image_raw"),
-            ("/camera_info", "/quin/camera_info")
-        ]
+            ('/image_raw', '/quin/image_raw'),
+            ('/camera_info', '/quin/camera_info'),
+        ],
+        arguments=[
+            '--ros-args',
+            '--log-level', 'camera:=error',
+            '--log-level', 'v4l2_camera:=error',
+            '--log-level', 'camera_calibration_parsers:=error',
+            '--log-level', 'camera_calibration_parsers:=fatal',
+        ],
+        # output='screen'
     )
 
     ld.add_action(camera_driver)
 
     return ld
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     generate_launch_description()
-
