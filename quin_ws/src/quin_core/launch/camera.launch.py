@@ -4,6 +4,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 from launch_ros.actions import Node
+# from launch.actions import ExecuteProcess
 
 
 def generate_launch_description():
@@ -19,7 +20,7 @@ def generate_launch_description():
             'image_size': [320, 240],
             'pixel_format': 'YUYV',  
             'output_encoding': 'yuv422_yuy2',
-            'time_per_frame': [1, 15]  # 30 FPS
+            'time_per_frame': [1, 10]  # 30 FPS
         }],
         remappings=[
             ('/image_raw', '/quin/image_raw'),
@@ -35,7 +36,18 @@ def generate_launch_description():
         # output='screen'
     )
 
+    # camera_upright = ExecuteProcess(
+    # cmd=[
+    #     'python3', '/home/quin/project_ws/quin_ws/src/quin_core/scripts/flip_camera.py',
+    #     '--ros-args',
+    #     '-p', 'in_topic:=/quin/image_raw',
+    #     '-p', 'out_topic:=/quin/image_raw/camera_upright'
+    # ],
+    # output='screen'
+    # )
+
     ld.add_action(camera_driver)
+    # ld.add_action(camera_upright)
 
     return ld
 
