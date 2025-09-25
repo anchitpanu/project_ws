@@ -56,7 +56,7 @@ class Gamepad:
 
 
     def update_drill(self):
-        if self.button_triangle and not self.previous_triangle_state:
+        if self.l1 and not self.previous_l1_state:
             self.drill = not self.drill
             if self.drill:
                 self.spin = False
@@ -65,7 +65,7 @@ class Gamepad:
                 self.last_macro_button = 'drill'
             else:
                 self.last_macro_button = None
-        self.previous_triangle_state = self.button_triangle
+        self.previous_l1_state = self.l1
 
     def update_spin(self):
         if self.button_circle and not self.previous_circle_state:
@@ -92,7 +92,7 @@ class Gamepad:
         self.previous_square_state = self.button_square
 
     def update_gripper(self):
-        if self.l1 and not self.previous_l1_state:
+        if self.r1 and not self.previous_r1_state:
             self.gripper = not self.gripper
             if self.gripper:
                 self.drill = False
@@ -101,7 +101,7 @@ class Gamepad:
                 self.last_macro_button = 'gripper'
             else:
                 self.last_macro_button = None
-        self.previous_l1_state = self.l1
+        self.previous_r1_state = self.r1
 
     def update_toggle_encoder(self):
         if self.PressedRightAnalog and not self.previous_PressedRightAnalog_state:
