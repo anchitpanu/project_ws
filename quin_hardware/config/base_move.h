@@ -79,23 +79,23 @@ ROBOT ORIENTATION
 
 // // Encoder 1 Parameter
 // #define MOTOR1_ENCODER_INCRIMENT 23
-// #define MOTOR1_ENCODER_PIN_A 22
-// #define MOTOR1_ENCODER_PIN_B 21
+#define MOTOR1_ENCODER_PIN_A 22
+#define MOTOR1_ENCODER_PIN_B 21
 
 // // Encoder 2 Parameter
 // #define MOTOR2_ENCODER_INCRIMENT 20
-// #define MOTOR2_ENCODER_PIN_A 17
-// #define MOTOR2_ENCODER_PIN_B 16
+#define MOTOR2_ENCODER_PIN_A 17
+#define MOTOR2_ENCODER_PIN_B 16
 
 // // Encoder 3 Parameter
 // #define MOTOR3_ENCODER_INCRIMENT 15
-// #define MOTOR3_ENCODER_PIN_A 14  
-// #define MOTOR3_ENCODER_PIN_B 41 
+#define MOTOR3_ENCODER_PIN_A 14  
+#define MOTOR3_ENCODER_PIN_B 41 
 
 // // Encoder 4 Parameter
 // #define MOTOR4_ENCODER_INCRIMENT 40
-// #define MOTOR4_ENCODER_PIN_A 39
-// #define MOTOR4_ENCODER_PIN_B 38
+#define MOTOR4_ENCODER_PIN_A 39
+#define MOTOR4_ENCODER_PIN_B 38
 
 // // I2C communication
 // #define SCL_PIN 19

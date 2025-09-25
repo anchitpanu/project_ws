@@ -36,9 +36,13 @@ class Cmd_vel_to_motor_speed(Node):
         self.yaw_setpoint = self.yaw
 
         self.motorspin1Speed: float = 0.0
+        self.motordrillSpeed: float = 0.0
+
+        self.servo_angle : float = 0.0
 
         self.BTN_CIRCLE = 1
         self.BTN_SQUARE = 3
+
 
         # self.previous_manual_turn = time.time()
 
@@ -54,22 +58,35 @@ class Cmd_vel_to_motor_speed(Node):
             Twist, "/quin/cmd_spin/rpm", qos_profile=qos.qos_profile_system_default
         )
 
+        self.send_drill_speed = self.create_publisher(
+            Twist, "/quin/cmd_drill/rpm", qos_profile=qos.qos_profile_system_default
+        )
+
+        self.send_gripper_angle = self.create_publisher(
+            Twist, "/quin/cmd_gripper/angle", qos_profile=qos.qos_profile_system_default
+        )
+
+
+
         self.create_subscription(
             Twist, '/quin/cmd_move', self.cmd_move, qos_profile=qos.qos_profile_system_default
         )
 
-        # self.create_subscription(
-        #     Twist, '/quin/cmd_spin', self.cmd_spin, qos_profile=qos.qos_profile_system_default
-        # )
+        self.create_subscription(
+            Joy, '/quin/joy/spin', self.cmd_spin, qos_profile=qos.qos_profile_sensor_data
+        )
 
         self.create_subscription(
-            Joy, '/quin/joy', self.cmd_spin, qos_profile=qos.qos_profile_sensor_data
+            Joy, '/quin/joy/drill', self.cmd_drill, qos_profile=qos.qos_profile_sensor_data
+        )
+
+        self.create_subscription(
+            Twist, '/quin/cmd_gripper', self.cmd_gripper, qos_profile=qos.qos_profile_system_default
         )
 
         self.create_subscription(
             Twist, "/quin/cmd_encoder", self.encoder, qos_profile=qos.qos_profile_sensor_data
         )
-
 
         self.sent_data_timer = self.create_timer(0.01, self.sendData)
         
@@ -116,6 +133,27 @@ class Cmd_vel_to_motor_speed(Node):
             self.motorspin1Speed = 0.0          # Stop
 
 
+    def cmd_drill(self, msg):
+
+        if msg.linear.z > 0.5:              # Down
+            self.motordrillSpeed = 1.0
+
+        elif msg.linear.z < -0.5:          # Up
+            self.motordrillSpeed = -1.0
+        
+        else:                               # Stop
+            self.motordrillSpeed = 0.0
+            
+
+    def cmd_gripper(self, msg):
+        if msg.linear.x == 1:               # Closed Servo
+            self.servo_angle = float(0.0)
+
+        if msg.linear.x == 2:               # Opened Servo
+            self.servo_angle = float(60.0)
+
+
+
     # def cmd_spin(self, msg):
 
     #     if msg.angular.z > 0.5:             // Clockwise
@@ -136,9 +174,13 @@ class Cmd_vel_to_motor_speed(Node):
 
         motorspin_msg = Twist()
         motorspin_msg.angular.z = float(self.motorspin1Speed)
+
+        motordrill_msg = Twist()
+        motordrill_msg.linear.z = float(self.motordrillSpeed)
         
         self.send_robot_speed.publish(motorspeed_msg)
         self.send_spin_speed.publish(motorspin_msg)
+        self.send_drill_speed.publish(motordrill_msg)
 
 
 def main():

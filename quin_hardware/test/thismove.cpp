@@ -26,8 +26,14 @@
 rcl_publisher_t debug_motor_publisher;
 geometry_msgs__msg__Twist debug_motor_msg;
 
+rcl_publisher_t debug_encoder_publisher;
+geometry_msgs__msg__Twist debug_encoder_msg;
+
 rcl_subscription_t motor_subscriber;        // subscribe /cmd_move
 geometry_msgs__msg__Twist motor_msg;
+
+rcl_subscription_t motor_subscriber;        // subscribe /cmd_encoder
+geometry_msgs__msg__Twist encoder_msg;
 
 rclc_executor_t executor;
 rclc_support_t support;
@@ -49,6 +55,22 @@ enum states
     AGENT_DISCONNECTED   // 3
 } state;
 
+ESP32Encoder encoder1;
+ESP32Encoder encoder2;
+ESP32Encoder encoder3;
+ESP32Encoder encoder4;
+
+int32_t lastPosition = 0;
+unsigned long lastTime = 0;
+
+float motor1RPM = 0;
+float motor2RPM = 0;
+float motor3RPM = 0;
+float motor4RPM = 0;
+
+float GEAR_RATIO = 1.15;
+int PULSES_PER_REVOLUTION = 2500;
+
 
 // ------ function list ------
 
@@ -59,6 +81,7 @@ bool destroyEntities();
 void publishData();
 struct timespec getTime();
 void Move();
+void Encoder();
 
 // ------ main ------
 
@@ -81,6 +104,18 @@ void setup()
     pinMode(MOTOR4_IN_A, OUTPUT);   // motor 4
     pinMode(MOTOR4_IN_B, OUTPUT);
 
+    if (MOTOR1_ENCODER_INV) encoder1.attachHalfQuad(MOTOR1_ENCODER_PIN_B, MOTOR1_ENCODER_PIN_A);
+    else encoder1.attachHalfQuad(MOTOR1_ENCODER_PIN_A, MOTOR1_ENCODER_PIN_B);
+    if (MOTOR2_ENCODER_INV) encoder2.attachHalfQuad(MOTOR2_ENCODER_PIN_B, MOTOR2_ENCODER_PIN_A);
+    else encoder2.attachHalfQuad(MOTOR2_ENCODER_PIN_A, MOTOR2_ENCODER_PIN_B);
+    if (MOTOR3_ENCODER_INV) encoder3.attachHalfQuad(MOTOR3_ENCODER_PIN_B, MOTOR3_ENCODER_PIN_A);
+    else encoder3.attachHalfQuad(MOTOR3_ENCODER_PIN_A, MOTOR3_ENCODER_PIN_B);
+    if (MOTOR4_ENCODER_INV) encoder4.attachHalfQuad(MOTOR4_ENCODER_PIN_B, MOTOR4_ENCODER_PIN_A);
+    else encoder4.attachHalfQuad(MOTOR4_ENCODER_PIN_A, MOTOR4_ENCODER_PIN_B);
+    encoder1.clearCount();
+    encoder2.clearCount();
+    encoder3.clearCount();
+    encoder4.clearCount();
 }
 
 void loop() {
@@ -143,6 +178,7 @@ void controlCallback(rcl_timer_t *timer, int64_t last_call_time)
     if (timer != NULL)
     {
         Move();
+        Encoder();
         publishData();
     }
 }
@@ -160,6 +196,7 @@ bool createEntities()       // create ROS entities
 {
     allocator = rcl_get_default_allocator();    // manage memory of micro-Ros
     geometry_msgs__msg__Twist__init(&debug_motor_msg);
+    geometry_msgs__msg__Twist__init(&debug_encoder_msg);
 
     init_options = rcl_get_zero_initialized_init_options();
     rcl_init_options_init(&init_options, allocator);
@@ -178,6 +215,12 @@ bool createEntities()       // create ROS entities
         &motor_subscriber, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
         "/quin/cmd_move"));
+
+    RCCHECK(rclc_publisher_init_best_effort(
+        &debug_encoder_publisher,
+        &node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+        "debug/cmd_encoder"));
 
     const unsigned int control_timeout = 20;
     RCCHECK(rclc_timer_init_default(
@@ -203,6 +246,8 @@ bool destroyEntities()      // destroy ROS entities
 
     rcl_publisher_fini(&debug_motor_publisher, &node);
     rcl_subscription_fini(&motor_subscriber, &node);
+    rcl_publisher_fini(&debug_encoder_publisher, &node);
+    rcl_subscription_fini(&encoder_subscriber, &node);
     rcl_node_fini(&node);
     rcl_timer_fini(&control_timer);
     rclc_executor_fini(&executor);
@@ -327,11 +372,49 @@ void Move()
 
 }
 
+void Encoder(){
+    // Read the current time in milliseconds
+    current_time = millis();
+
+    // Calculate the time difference between the current time and the last time the position was updated
+    unsigned long time_diff = (current_time - lastTime);
+    long encoder1Position = encoder1.getCount();
+    long encoder2Position = encoder2.getCount();
+    long encoder3Position = encoder3.getCount();
+    long encoder4Position = encoder4.getCount();
+
+    // motor1RPM = (encoder1Position / (float)PULSES_PER_REVOLUTION) * (60.0 / (time_diff / 1000.0)) * 0.05 * 2.0 * 3.14 * GEAR_RATIO;
+    // motor2RPM = (encoder2Position / (float)PULSES_PER_REVOLUTION) * (60.0 / (time_diff / 1000.0)) * 0.05 * 2.0 * 3.14 * GEAR_RATIO;
+    // motor3RPM = (encoder3Position / (float)PULSES_PER_REVOLUTION) * (60.0 / (time_diff / 1000.0)) * 0.05 * 2.0 * 3.14 * GEAR_RATIO;
+    // motor4RPM = (encoder4Position / (float)PULSES_PER_REVOLUTION) * (60.0 / (time_diff / 1000.0)) * 0.05 * 2.0 * 3.14 * GEAR_RATIO;
+    motor1RPM = (encoder2Position / (float)PULSES_PER_REVOLUTION) * (60000.0 / time_diff);
+    motor2RPM = (encoder2Position / (float)PULSES_PER_REVOLUTION) * (60000.0 / time_diff);
+    motor3RPM = (encoder3Position / (float)PULSES_PER_REVOLUTION) * (60000.0 / time_diff);
+    motor4RPM = (encoder4Position / (float)PULSES_PER_REVOLUTION) * (60000.0 / time_diff);
+
+    encoder1.clearCount();
+    encoder2.clearCount();
+    encoder3.clearCount();
+    encoder4.clearCount();
+    
+}
+
 void publishData()
 {
     debug_motor_msg.linear.x = motor_msg.linear.x;   // m/s
     debug_motor_msg.angular.z = motor_msg.angular.z; // rad/s
 
+    float leftRPM  = (motor1RPM + motor3RPM) / 2.0;
+    float rightRPM = (motor2RPM + motor4RPM) / 2.0;
+
+    float wheel_circumference = WHEEL_DIAMETER * PI;
+    float leftLinear  = leftRPM  * wheel_circumference / 60.0;
+    float rightLinear = rightRPM * wheel_circumference / 60.0;
+
+    debug_encoder_msg.linear.x  = (leftLinear + rightLinear) / 2.0;                     // linear velocity in m/s
+    debug_encoder_msg.angular.z = (rightLinear - leftLinear) / LR_WHEELS_DISTANCE;      // angular velocity in rad/s
+    struct timespec time_stamp = getTime();
+    rcl_publish(&debug_encoder_publisher, &debug_encoder_msg, NULL);
 
     rcl_publish(&debug_motor_publisher, &debug_motor_msg, NULL);
 }

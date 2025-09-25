@@ -13,7 +13,7 @@
 #include <ESP32Encoder.h>
 #include <Stepper.h>
 
-#include "../config/spin.h" 
+#include "../config/digging.h" 
 
 
 // -------- Helpers --------
@@ -24,11 +24,11 @@
 
 // -------- ROS entities --------
 
-rcl_publisher_t debug_spin_publisher;
-geometry_msgs__msg__Twist debug_spin_msg;
+rcl_publisher_t debug_gripper_publisher;
+geometry_msgs__msg__Twist debug_gripper_msg;
 
-rcl_subscription_t spin_subscriber;        // subscribe /cmd_spin
-geometry_msgs__msg__Twist spin_msg;
+rcl_subscription_t gripper_subscriber;        // subscribe /cmd_drill
+geometry_msgs__msg__Twist gripper_msg;
 
 rclc_executor_t executor;
 rclc_support_t support;
@@ -46,49 +46,35 @@ enum states
 {
     WAITING_AGENT,       // 0
     AGENT_AVAILABLE,     // 1
-    AGENT_CONNECTED,     // 2
+    AGENT_CONNECTED,     // 2 
     AGENT_DISCONNECTED   // 3
 } state;
 
-
-// ---------------- Stepper driver ----------------
-<<<<<<< HEAD
-Stepper myStepper(STEPS_PER_REV, STEPPER_IN1, STEPPER_IN2);
-=======
-Stepper myStepper(STEPS_PER_REV, PLS_PIN, DIR_PIN);
->>>>>>> c92d1ca (spin_control)
-
-// Movement queue: remaining steps to execute (positive or negative)
+// Stepper myStepper(STEPS_PER_REV, DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR);
 volatile long remaining_steps = 0;
-
-// Edge-detection state for joystick direction
-// -1 = last was LEFT, 0 = neutral, 1 = RIGHT
 int last_dir = 0;
 
+Servo myservo;  // create servo object to control a servo
 
-// ------ function list ------
-
+// ---------------- Function prototypes ----------------
 void rclErrorLoop();
 void syncTime();
 bool createEntities();
 bool destroyEntities();
 void publishData();
 struct timespec getTime();
-void Spin();
+void Gripper();
 
-// ------ main ------
+
 
 void setup()
 {
-    // put your setup code here, to run once:
-    Serial.begin(115200);
-    set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
+  myServo.attach(9);   // attach servo signal pin to D9
+  Serial.begin(115200);
 
-    // Stepper pins
-    // pinMode(STEPPER_PIN_EN, OUTPUT);
-    // digitalWrite(STEPPER_PIN_EN, LOW);        // enable (LOW ส่วนใหญ่)
-
-    myStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
+  // Start in closed position
+  myServo.write(SERVO_CLOSED);
+  delay(1000);
 }
 
 void loop() {
@@ -115,14 +101,12 @@ void loop() {
   }
 }
 
-// ------ functions ------
-
 void controlCallback(rcl_timer_t *timer, int64_t last_call_time)
 {
     RCLC_UNUSED(last_call_time);
     if (timer != NULL)
     {
-        Spin();
+        Gripper();
         publishData();
     }
 }
@@ -131,13 +115,13 @@ void twistCallback(const void *msgin)
 {   
     const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
     prev_cmd_time = millis();
-    spin_msg.angular.z = msg->angular.z; // rotate
+    gripper_msg.linear.x = msg->linear.x;
 }
 
 bool createEntities()       // create ROS entities 
 {
     allocator = rcl_get_default_allocator();    // manage memory of micro-Ros
-    geometry_msgs__msg__Twist__init(&debug_spin_msg);
+    geometry_msgs__msg__Twist__init(&debug_gripper_msg);
 
     init_options = rcl_get_zero_initialized_init_options();
     rcl_init_options_init(&init_options, allocator);
@@ -148,14 +132,14 @@ bool createEntities()       // create ROS entities
     RCCHECK(rclc_node_init_default(&node, "quin_robot_node", "", &support));
 
     RCCHECK(rclc_publisher_init_best_effort(
-        &debug_spin_publisher, &node,
+        &debug_gripper_publisher, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-        "/quin/debug/spin"));
+        "/quin/debug/gripper"));
 
     RCCHECK(rclc_subscription_init_best_effort(
-        &spin_subscriber, &node,
+        &gripper_subscriber, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-        "/quin/cmd_spin"));
+        "/quin/cmd_gripper"));
 
     const unsigned int control_timeout = 20;
     RCCHECK(rclc_timer_init_default(
@@ -166,7 +150,7 @@ bool createEntities()       // create ROS entities
     RCCHECK(rclc_executor_init(&executor, &support.context, 3, &allocator));    // max handles = 3
 
     RCCHECK(rclc_executor_add_subscription(
-        &executor, &spin_subscriber, &spin_msg, &twistCallback, ON_NEW_DATA));
+        &executor, &gripper_subscriber, &gripper_msg, &twistCallback, ON_NEW_DATA));
 
     RCCHECK(rclc_executor_add_timer(&executor, &control_timer));
     syncTime();
@@ -179,8 +163,8 @@ bool destroyEntities()      // destroy ROS entities
     // rmw_context_t *rmw_context = rcl_context_get_rmw_context(&support.context);
     // (void)rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
 
-    rcl_publisher_fini(&debug_spin_publisher, &node);
-    rcl_subscription_fini(&spin_subscriber, &node);
+    rcl_publisher_fini(&debug_gripper_publisher, &node);
+    rcl_subscription_fini(&gripper_subscriber, &node);
     rcl_node_fini(&node);
     rcl_timer_fini(&control_timer);
     rclc_executor_fini(&executor);
@@ -189,44 +173,24 @@ bool destroyEntities()      // destroy ROS entities
     return true;
 }
 
-void Spin()
+void Gripper()
 {
-    const float z = spin_msg.angular.z;
-
-    if (z > TWIST_THRESH && last_dir != 1) {
-      digitalWrite(DIR_PIN, HIGH);          // press = clockwise 36 degree
-      for (int i = 0; i < STEPS_PER_36; i++) {
-      digitalWrite(PLS_PIN, HIGH);
-      delayMicroseconds(STEP_PULSE_HIGH_US);               // adjust speed here (lower = faster)
-      digitalWrite(PLS_PIN, LOW);
-      delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
-      }
-      last_dir = 1;                         // prevent re-trigger until direction changes
-    } 
-    
-    else if (z < -TWIST_THRESH && last_dir != -1) {
-      digitalWrite(DIR_PIN, LOW);           // press = counter-clockwise 36 degree
-      for (int i = 0; i < STEPS_PER_36; i++) {
-        digitalWrite(PLS_PIN, HIGH);
-        delayMicroseconds(STEP_PULSE_HIGH_US);
-        digitalWrite(PLS_PIN, LOW);
-        delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
-      }
-      last_dir = -1;
-    }
-    
-    else if (fabs(z) < TWIST_DEADZONE) {
-      last_dir = 0;  // reset edge detection
+    if (gripper_msg.linear.x == 2) {
+        myservo.write(SERVO_OPEN);
+        gripper_msg.linear.x = 2.0;  // indicate opened
+    } else if (gripper_msg.linear.x == 1) {
+        myservo.write(SERVO_CLOSED);
+        gripper_msg.linear.x = 1.0;  // indicate closed
     }
 
-    debug_spin_msg.angular.z = z;
+    debug_gripper_msg.linear.x = gripper_msg.linear.x;
 }
 
 void publishData()
 {
-    debug_spin_msg.angular.z = spin_msg.angular.z;
+    debug_gripper_msg.linear.x = gripper_msg.linear.x;
 
-    rcl_publish(&debug_spin_publisher, &debug_spin_msg, NULL);
+    rcl_publish(&debug_gripper_publisher, &debug_gripper_msg, NULL);
 }
 
 void syncTime()
@@ -264,7 +228,3 @@ void rclErrorLoop() {
 
     ESP.restart();
 }
-
-
-
-

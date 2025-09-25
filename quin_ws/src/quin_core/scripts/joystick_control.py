@@ -42,6 +42,7 @@ class Gamepad:
         self.drill: bool = False
         self.spin: bool = False
         self.spinback: bool = False
+        self.gripper: bool = False
         self.toggle_encoder_bool : bool = False
 
         self.previous_triangle_state = False
@@ -60,6 +61,7 @@ class Gamepad:
             if self.drill:
                 self.spin = False
                 self.spinback = False
+                self.gripper = False
                 self.last_macro_button = 'drill'
             else:
                 self.last_macro_button = None
@@ -71,6 +73,7 @@ class Gamepad:
             if self.spin:
                 self.drill = False
                 self.spinback = False
+                self.gripper = False
                 self.last_macro_button = 'spin'
             else:
                 self.last_macro_button = None
@@ -82,10 +85,23 @@ class Gamepad:
             if self.spinback:
                 self.drill = False
                 self.spin = False
+                self.gripper = False
                 self.last_macro_button = 'spinback'
             else:
                 self.last_macro_button = None
         self.previous_square_state = self.button_square
+
+    def update_gripper(self):
+        if self.l1 and not self.previous_l1_state:
+            self.gripper = not self.gripper
+            if self.gripper:
+                self.drill = False
+                self.spin = False
+                self.spinback = False
+                self.last_macro_button = 'gripper'
+            else:
+                self.last_macro_button = None
+        self.previous_l1_state = self.l1
 
     def update_toggle_encoder(self):
         if self.PressedRightAnalog and not self.previous_PressedRightAnalog_state:
@@ -97,6 +113,7 @@ class Gamepad:
         self.drill = False
         self.spin = False 
         self.spinback = False
+        self.gripper = False
         self.last_macro_button = None
         
 
@@ -111,6 +128,14 @@ class Joystick(Node):
 
         self.pub_spin = self.create_publisher(
             Twist, "/quin/cmd_spin", qos_profile=qos.qos_profile_system_default
+        )
+
+        self.pub_drill = self.create_publisher(
+            Twist, "/quin/cmd_drill", qos_profile=qos.qos_profile_system_default
+        )
+
+        self.pub_gripper = self.create_publisher(
+            Twist, "/quin/cmd_gripper", qos_profile=qos.qos_profile_system_default
         )
 
         self.pub_encoder = self.create_publisher(
@@ -161,8 +186,7 @@ class Joystick(Node):
         #Macro-----------------------------------------------------------
         
         self.gamepad.update_drill()
-        # self.gamepad.update_spin()
-        # self.gamepad.update_spinback()
+        self.gamepad.update_gripper()
         self.gamepad.update_toggle_encoder()
 
         # press=1 release=0
@@ -197,12 +221,22 @@ class Joystick(Node):
             cmd_spin.angular.z = 0.0          # Stop
         self.pub_spin.publish(cmd_spin)
 
+        # drill command: -1/0/+1 on linear.z
+        cmd_drill = Twist()
+        
+        if self.gamepad.drill:
+            cmd_drill.linear.z = +1.0         # l1: drill down
+        else:
+            cmd_drill.linear.z = 0.0          # Stop
+        self.pub_drill.publish(cmd_drill)
+
 
         if self.gamepad.toggle_encoder_bool:
             cmd_encoder.linear.x = 2.0 #RPM
         else:
             cmd_encoder.linear.x = 1.0 #Bit
         
+
         self.pub_encoder.publish(cmd_encoder)
         self.pub_move.publish(cmd_vel_move)
 
