@@ -53,18 +53,18 @@ ROBOT ORIENTATION
 
 // Motor 1 Parameters
 // #define MOTOR1_PWM  0
-#define MOTOR1_IN_A 14
-#define MOTOR1_IN_B 32
+#define MOTOR1_IN_A 32
+#define MOTOR1_IN_B 33
 
 // Motor 2 Parameters
 // #define MOTOR2_PWM  3
-#define MOTOR2_IN_A 19
-#define MOTOR2_IN_B 18
+#define MOTOR2_IN_A 18
+#define MOTOR2_IN_B 19
 
 // Motor 3 Parameters
 // #define MOTOR3_PWM  6
-#define MOTOR3_IN_A 33
-#define MOTOR3_IN_B 25
+#define MOTOR3_IN_A 27
+#define MOTOR3_IN_B 14
 
 // Motor 4 Parameters
 // #define MOTOR4_PWM  9
@@ -79,13 +79,13 @@ ROBOT ORIENTATION
 
 // // Encoder 1 Parameter
 // #define MOTOR1_ENCODER_INCRIMENT 23
-#define MOTOR1_ENCODER_PIN_A 22
-#define MOTOR1_ENCODER_PIN_B 21
+#define MOTOR1_ENCODER_PIN_A 12
+#define MOTOR1_ENCODER_PIN_B 13
 
 // // Encoder 2 Parameter
 // #define MOTOR2_ENCODER_INCRIMENT 20
-#define MOTOR2_ENCODER_PIN_A 17
-#define MOTOR2_ENCODER_PIN_B 16
+#define MOTOR2_ENCODER_PIN_A 22
+#define MOTOR2_ENCODER_PIN_B 23
 
 // // Encoder 3 Parameter
 // #define MOTOR3_ENCODER_INCRIMENT 15
@@ -94,8 +94,8 @@ ROBOT ORIENTATION
 
 // // Encoder 4 Parameter
 // #define MOTOR4_ENCODER_INCRIMENT 40
-#define MOTOR4_ENCODER_PIN_A 39
-#define MOTOR4_ENCODER_PIN_B 38
+#define MOTOR4_ENCODER_PIN_A 15
+#define MOTOR4_ENCODER_PIN_B 4
 
 // // I2C communication
 // #define SCL_PIN 19
