@@ -14,7 +14,7 @@ ROBOT ORIENTATION
 #define K_I 0.8
 #define K_D 0.5
 #define K_F 0.2
-#define I_Max -1
+#define I_Max -1  // Maximum integral value for PID controller
 #define I_Min -1 
 
 //define your robot' specs here
