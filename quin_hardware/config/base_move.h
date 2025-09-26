@@ -40,7 +40,7 @@ ROBOT ORIENTATION
 #define PWM_Min -PWM_Max
 
 // INVERT MOTOR DIRECTIONS
-#define MOTOR1_INV true
+#define MOTOR1_INV false
 #define MOTOR2_INV true
 #define MOTOR3_INV false
 #define MOTOR4_INV true
@@ -63,8 +63,8 @@ ROBOT ORIENTATION
 
 // Motor 3 Parameters
 // #define MOTOR3_PWM  6
-#define MOTOR3_IN_A 27
-#define MOTOR3_IN_B 14
+#define MOTOR3_IN_A 26
+#define MOTOR3_IN_B 27
 
 // Motor 4 Parameters
 // #define MOTOR4_PWM  9
@@ -79,7 +79,7 @@ ROBOT ORIENTATION
 
 // // Encoder 1 Parameter
 // #define MOTOR1_ENCODER_INCRIMENT 23
-#define MOTOR1_ENCODER_PIN_A 12
+#define MOTOR1_ENCODER_PIN_A 11
 #define MOTOR1_ENCODER_PIN_B 13
 
 // // Encoder 2 Parameter

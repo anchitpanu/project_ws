@@ -104,8 +104,8 @@ class Cmd_vel_to_motor_speed(Node):
         self.turnSpeed = self.turnSpeed * 5     # Scale factor for angular velocity
 
         # Compute left and right wheel speeds (in m/s)
-        left_speed = self.moveSpeed - (self.turnSpeed * self.wheel_base / 2.0)
-        right_speed = self.moveSpeed + (self.turnSpeed * self.wheel_base / 2.0)
+        left_speed = self.moveSpeed + (self.turnSpeed * self.wheel_base / 2.0)
+        right_speed = self.moveSpeed - (self.turnSpeed * self.wheel_base / 2.0)
 
         # Convert to motor speeds in RPM (optional)
         rpm_left = float(left_speed * self.maxRPM)
