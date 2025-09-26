@@ -94,35 +94,7 @@ void loop() {
       break;
     case AGENT_CONNECTED:
       EXECUTE_EVERY_N_MS(500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 10)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
-      if (state == AGENT_CONNECTED) {void loop()
-{
-    switch (state)
-    {
-    case WAITING_AGENT:
-        EXECUTE_EVERY_N_MS(500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_AVAILABLE : WAITING_AGENT;);
-        break;
-    case AGENT_AVAILABLE:
-        state = (true == createEntities()) ? AGENT_CONNECTED : WAITING_AGENT;
-        if (state == WAITING_AGENT)
-        {
-            destroyEntities();
-        }
-        break;
-    case AGENT_CONNECTED:
-        EXECUTE_EVERY_N_MS(200, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
-        if (state == AGENT_CONNECTED)
-        {
-            rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100));
-        }
-        break;
-    case AGENT_DISCONNECTED:
-        destroyEntities();
-        state = WAITING_AGENT;
-        break;
-    default:
-        break;
-    }
-}
+      if (state == AGENT_CONNECTED) {
         rclc_executor_spin_some(&executor, RCL_MS_TO_NS(5));
       }
       break;
