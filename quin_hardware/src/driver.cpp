@@ -189,7 +189,7 @@ void Move()
 
     // from geometry_msgs/Twist
     float Vx = motor_msg.linear.x;   // m/s
-    float Wz = motor_msg.angular.z;  // rad/s
+    float Wz = -motor_msg.angular.z;  // rad/s
 
     // Kinematics for differntial
     float wheel_left = Vx - (Wz * LR_WHEELS_DISTANCE * 0.5f);
