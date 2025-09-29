@@ -27,6 +27,13 @@ def generate_launch_description():
         arguments=["serial", "--dev", "/dev/ttyUSB0"],
     )
     
+    node_microros_2 = Node(
+        package="micro_ros_agent",
+        executable="micro_ros_agent",
+        output="screen",
+        arguments=["serial", "--dev", "/dev/ttyUSB1"],
+    )  
+
     cmd_move = Node(
         package="quin_core",
         executable="cmd_move.py",
@@ -42,7 +49,6 @@ def generate_launch_description():
     # ld.add_action(microros_launch)
     # ld.add_action(cmd_move)
     ld.add_action(node_microros_1)
-
-
+    ld.add_action(node_microros_2) 
 
     return ld

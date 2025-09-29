@@ -176,7 +176,7 @@ bool destroyEntities()      // destroy ROS entities
 void Gripper()
 {
     if (gripper_msg.linear.x == 2) {
-        myservo.write(SERVO_OPEN);
+        myservo.write(SERVO_OPENED);
         gripper_msg.linear.x = 2.0;  // indicate opened
     } else if (gripper_msg.linear.x == 1) {
         myservo.write(SERVO_CLOSED);
