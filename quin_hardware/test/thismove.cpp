@@ -71,6 +71,17 @@ float motor4RPM = 0;
 float GEAR_RATIO = 1.15;
 int PULSES_PER_REVOLUTION = 2500;
 
+// --- Distance/odometry state (meters/radians) ---
+double dist1 = 0.0, dist2 = 0.0, dist3 = 0.0, dist4 = 0.0;  // per-wheel accumulated distance
+double dist_left = 0.0, dist_right = 0.0, dist_avg = 0.0;   // left/right/average distance
+double theta_sum = 0.0;                                     // accumulated rotation (rad)
+
+// --- Encoder counting mode factor ---
+// Using attachHalfQuad() → counts x2
+// (if using attachFullQuad() instead, set this to 4)
+const int ENCODER_QUAD = 2;
+
+
 
 // ------ function list ------
 
@@ -372,31 +383,48 @@ void Move()
 
 }
 
-void Encoder(){
-    // Read the current time in milliseconds
+void Encoder() {
+    // track time (not needed for distance, but kept for consistency)
     current_time = millis();
-
-    // Calculate the time difference between the current time and the last time the position was updated
     unsigned long time_diff = (current_time - lastTime);
-    long encoder1Position = encoder1.getCount();
-    long encoder2Position = encoder2.getCount();
-    long encoder3Position = encoder3.getCount();
-    long encoder4Position = encoder4.getCount();
+    lastTime = current_time;
 
-    // motor1RPM = (encoder1Position / (float)PULSES_PER_REVOLUTION) * (60.0 / (time_diff / 1000.0)) * 0.05 * 2.0 * 3.14 * GEAR_RATIO;
-    // motor2RPM = (encoder2Position / (float)PULSES_PER_REVOLUTION) * (60.0 / (time_diff / 1000.0)) * 0.05 * 2.0 * 3.14 * GEAR_RATIO;
-    // motor3RPM = (encoder3Position / (float)PULSES_PER_REVOLUTION) * (60.0 / (time_diff / 1000.0)) * 0.05 * 2.0 * 3.14 * GEAR_RATIO;
-    // motor4RPM = (encoder4Position / (float)PULSES_PER_REVOLUTION) * (60.0 / (time_diff / 1000.0)) * 0.05 * 2.0 * 3.14 * GEAR_RATIO;
-    motor1RPM = (encoder2Position / (float)PULSES_PER_REVOLUTION) * (60000.0 / time_diff);
-    motor2RPM = (encoder2Position / (float)PULSES_PER_REVOLUTION) * (60000.0 / time_diff);
-    motor3RPM = (encoder3Position / (float)PULSES_PER_REVOLUTION) * (60000.0 / time_diff);
-    motor4RPM = (encoder4Position / (float)PULSES_PER_REVOLUTION) * (60000.0 / time_diff);
+    // read incremental counts
+    long c1 = encoder1.getCount();
+    long c2 = encoder2.getCount();
+    long c3 = encoder3.getCount();
+    long c4 = encoder4.getCount();
 
+    // pulses per wheel revolution (encoder + counting mode + gear ratio)
+    const double counts_per_wheel_rev = (double)PULSES_PER_REVOLUTION * (double)ENCODER_QUAD * (double)GEAR_RATIO;
+    const double wheel_circumference = (double)WHEEL_DIAMETER * M_PI;  // meters
+
+    // convert to distance increment (m)
+    const double d1 = ((double)c1 / counts_per_wheel_rev) * wheel_circumference;
+    const double d2 = ((double)c2 / counts_per_wheel_rev) * wheel_circumference;
+    const double d3 = ((double)c3 / counts_per_wheel_rev) * wheel_circumference;
+    const double d4 = ((double)c4 / counts_per_wheel_rev) * wheel_circumference;
+
+    // accumulate wheel distances
+    dist1 += d1;  dist2 += d2;  dist3 += d3;  dist4 += d4;
+
+    // left/right increments (average of front+rear per side)
+    const double dL = 0.5 * (d1 + d3);  // left  = wheel1 (front-left) + wheel3 (rear-left)
+    const double dR = 0.5 * (d2 + d4);  // right = wheel2 (front-right) + wheel4 (rear-right)
+
+    // accumulate chassis odometry
+    dist_left  += dL;   
+    dist_right += dR;   
+    dist_avg    = 0.5 * (dist_left + dist_right);
+
+    // accumulate orientation (rad)
+    theta_sum += (dR - dL) / (double)LR_WHEELS_DISTANCE;
+
+    // reset encoder counters to measure increments again
     encoder1.clearCount();
     encoder2.clearCount();
     encoder3.clearCount();
     encoder4.clearCount();
-    
 }
 
 void publishData()
@@ -404,19 +432,13 @@ void publishData()
     debug_motor_msg.linear.x = motor_msg.linear.x;   // m/s
     debug_motor_msg.angular.z = motor_msg.angular.z; // rad/s
 
-    float leftRPM  = (motor1RPM + motor3RPM) / 2.0;
-    float rightRPM = (motor2RPM + motor4RPM) / 2.0;
-
-    float wheel_circumference = WHEEL_DIAMETER * PI;
-    float leftLinear  = leftRPM  * wheel_circumference / 60.0;
-    float rightLinear = rightRPM * wheel_circumference / 60.0;
-
-    debug_encoder_msg.linear.x  = (leftLinear + rightLinear) / 2.0;                     // linear velocity in m/s
-    debug_encoder_msg.angular.z = (rightLinear - leftLinear) / LR_WHEELS_DISTANCE;      // angular velocity in rad/s
-    struct timespec time_stamp = getTime();
-    rcl_publish(&debug_encoder_publisher, &debug_encoder_msg, NULL);
+    debug_encoder_msg.linear.x  = (float)dist_left;     //   linear.x = left wheel distance (m)
+    debug_encoder_msg.linear.y  = (float)dist_right;    //   linear.y = right wheel distance (m)
+    debug_encoder_msg.linear.z  = (float)dist_avg;      //   linear.z = average distance (m)
+    debug_encoder_msg.angular.z = (float)theta_sum;     //   angular.z = accumulated rotation (rad)
 
     rcl_publish(&debug_motor_publisher, &debug_motor_msg, NULL);
+    rcl_publish(&debug_encoder_publisher, &debug_encoder_msg, NULL);
 }
 
 void syncTime()
