@@ -64,18 +64,15 @@ struct timespec getTime();
 void Drill();
 
 
-
 void setup()
 {
     // put your setup code here, to run once:
     Serial.begin(115200);
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
 
-    // Stepper pins
-    // pinMode(STEPPER_PIN_EN, OUTPUT);
-    // digitalWrite(STEPPER_PIN_EN, LOW);        // enable (LOW ส่วนใหญ่)
-
-    myStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
+    stepper.setMaxSpeed(MAX_SPEED_STEPS_S);   // steps/sec
+    stepper.setAcceleration(ACCEL_STEPS_S2);  // steps/sec^2
+    stepper.setCurrentPosition(0);            // 0 = top
 }
 
 void loop() {
@@ -176,37 +173,44 @@ bool destroyEntities()      // destroy ROS entities
 
 void Drill()
 {
-    int N = (int)(DIST_PER_TRIGGER_MM * STEPS_PER_MM + 0.5f);
-    if (N < 1) N = 1;   // at least 1 step
+  const float z = drill_msg.linear.z;
+  const bool pressed_now = (fabsf(z) >= PRESS_THRESH);
+  const bool rising_edge = pressed_now && !prev_pressed;
 
-    if (drill_msg.linear.z > TWIST_THRESH && last_dir != 1) {
-      digitalWrite(DRILL_STEP_PIN_DIR, HIGH);          // press = down to soil
-      for (int i = 0; i < N; i++) {
-        digitalWrite(DRILL_STEP_PIN_PLS, HIGH);
-        delayMicroseconds(STEP_PULSE_HIGH_US);               // adjust speed here (lower = faster)
-        digitalWrite(DRILL_STEP_PIN_PLS, LOW);
-        delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
-      }
-      last_dir = 1;                         // prevent re-trigger until direction changes
-    } 
+  if (rising_edge)
+  {
+    const long steps_per_press = lroundf(PRESS_TRAVEL_MM * STEPS_PER_MM);
+    const long max_steps       = (MAX_TRAVEL_MM > 0) ? lroundf(MAX_TRAVEL_MM * STEPS_PER_MM) : LONG_MAX;
 
-    else if (drill_msg.linear.z < -TWIST_THRESH && last_dir != -1) {
-      digitalWrite(DRILL_STEP_PIN_DIR, LOW);           // press = counter-clockwise 36 degree
-      for (int i = 0; i < N; i++) {
-        digitalWrite(DRILL_STEP_PIN_PLS, HIGH);
-        delayMicroseconds(STEP_PULSE_HIGH_US);
-        digitalWrite(DRILL_STEP_PIN_PLS, LOW);
-        delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
-      }
-      last_dir = -1;
-    }
-    
-    else if (fabs(drill_msg.linear.z) < TWIST_DEADZONE) {
-      last_dir = 0;  // reset
+    // current signed position: 0 = top, +down
+    long cur = stepper.currentPosition();
+    long tgt = cur;
+
+    if (move_down_next) {
+      // Move DOWN (positive direction)
+      long down_room = max_steps - cur;                  // remaining room to bottom
+      long delta     = steps_per_press <= down_room ? steps_per_press : down_room;
+      tgt = cur + delta;
+      move_down_next = false;                            // next time go up
+    } else {
+      // Move UP (negative direction)
+      long up_room = cur;                                // distance to top (0)
+      long delta   = steps_per_press <= up_room ? steps_per_press : up_room;
+      tgt = cur - delta;
+      move_down_next = true;                             // next time go down
     }
 
-    debug_drill_msg.linear.z = drill_msg.linear.z;
+    // Set target (clamped implicitly by delta above)
+    stepper.moveTo(tgt);
+  }
+
+  prev_pressed = pressed_now;
+
+  // debug out
+  debug_drill_msg.linear.z = drill_msg.linear.z;
 }
+
+
 
 void publishData()
 {

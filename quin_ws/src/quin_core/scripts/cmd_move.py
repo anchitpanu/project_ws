@@ -42,6 +42,7 @@ class Cmd_vel_to_motor_speed(Node):
 
         self.BTN_CIRCLE = 1
         self.BTN_SQUARE = 3
+        self.BTN_R1 = 5
 
 
         # self.previous_manual_turn = time.time()
@@ -135,15 +136,19 @@ class Cmd_vel_to_motor_speed(Node):
 
     def cmd_drill(self, msg):
 
-        if msg.linear.z > 0.5:              # Down
-            self.motordrillSpeed = 1.0
+        r1 = (len(msg.buttons) > self.BTN_R1 and msg.buttons[self.BTN_R1] == 1)
 
-        elif msg.linear.z < -0.5:          # Up
-            self.motordrillSpeed = -1.0
+        # Edge-detect without editing __init__
+        if not hasattr(self, "_prev_drill_pressed"):
+            self._prev_drill_pressed = False
+
+        if r1 and not self._prev_drill_pressed:
+            # Emit a short pulse: 1.0 then auto-reset to 0.0
+            self.motordrillSpeed = 1.0
+            threading.Timer(0.05, lambda: setattr(self, "motordrillSpeed", 0.0)).start()
+
+        self._prev_drill_pressed = r1
         
-        else:                               # Stop
-            self.motordrillSpeed = 0.0
-            
 
     def cmd_gripper(self, msg):
         if msg.linear.x == 1:               # Closed Servo
@@ -151,19 +156,6 @@ class Cmd_vel_to_motor_speed(Node):
 
         if msg.linear.x == 2:               # Opened Servo
             self.servo_angle = float(60.0)
-
-
-
-    # def cmd_spin(self, msg):
-
-    #     if msg.angular.z > 0.5:             // Clockwise
-    #         self.motorspin1Speed = 1.0
-
-    #     elif msg.angular.z < -0.5:          // Counter-Clockwise
-    #         self.motorspin1Speed = -1.0
-        
-    #     else:                               // Stop
-    #         self.motorspin1Speed = 0.0
 
 
     def sendData(self):

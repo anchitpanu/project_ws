@@ -1,29 +1,26 @@
 #ifndef DIGGING_H
 #define DIGGING_H
 
-const float TWIST_THRESH   = 0.2f;   // adjust as needed; velocity threshold to start spinning
-const float TWIST_DEADZONE = 0.05f;
-
 #define DRILL_STEP_PIN_DIR  25
 #define DRILL_STEP_PIN_PLS  26
 
-#define MOTOR_STEPS_PER_REV 200     // NEMA17 1.8° = 200
-#define MICROSTEP            16     // DIP on A4988/DRV8825/TMC
-#define STEPS_PER_REV         (MOTOR_STEPS_PER_REV * MICROSTEP)
+static const float STEPS_PER_MM = 40.0f;            // set correctly for your mechanism!
 
-#define GEAR_MODULE           1.0f
-#define PINION_TEETH          20
-#define LINEAR_PER_REV_MM     (M_PI * GEAR_MODULE * PINION_TEETH)
+static const float PRESS_TRAVEL_MM = 200.0f;        // 20 cm
 
-#define STEPS_PER_MM          (STEPS_PER_REV / LINEAR_PER_REV_MM)
+// Optional soft limits (top = 0 mm, positive = down)
+static const float MAX_TRAVEL_MM = 400.0f;          // e.g., 40 cm stroke. Set to your real value.
 
-#define DIST_PER_TRIGGER_MM   5.0f  // how many mm per trigger press
+// Step timing
+static const uint32_t STEP_PULSE_HIGH_US = STEP_PULSE_HIGH_US;   // you already have this const
+static const uint32_t STEP_PERIOD_US     = STEP_PERIOD_US;       // you already have this const
 
-#define STEP_PULSE_HIGH_US    5     // width of STEP pulse (3–5us typical)  
-#define STEP_PERIOD_US   2000       // adjust speed here (lower = faster)
+// Trigger threshold (treat this as a "button" from joystick)
+static const float PRESS_THRESH = 0.8f;   // consider pressed when |z| >= 0.8 (adjust if needed)
 
-// // Stepper speed (RPM). 8–12 is safe for 28BYJ-48
-#define STEPPER_RPM   10
+static bool    prev_pressed = false;      // edge detect
+static bool    move_down_next = true;     // toggles every valid press
+static long    current_steps = 0;         // 0 at top; +down (software odometer)
 
 const int SERVO_CLOSED = 0;     // fully closed position
 const int SERVO_OPENED = 60;    // opened position (adjust as needed)
