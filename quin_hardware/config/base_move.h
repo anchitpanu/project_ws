@@ -38,6 +38,8 @@ ROBOT ORIENTATION
 #define PWM_FREQUENCY 20000                                             // PWM Frequency
 #define PWM_Max pow(2, PWM_BITS) - 1
 #define PWM_Min -PWM_Max
+#define GEAR_RATIO  1.0f
+#define PULSES_PER_REVOLUTION  2048.0f
 
 // INVERT MOTOR DIRECTIONS
 #define MOTOR1_INV false

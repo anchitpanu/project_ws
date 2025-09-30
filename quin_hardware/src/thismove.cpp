@@ -32,9 +32,6 @@ geometry_msgs__msg__Twist debug_encoder_msg;
 rcl_subscription_t motor_subscriber;        // subscribe /cmd_move
 geometry_msgs__msg__Twist motor_msg;
 
-rcl_subscription_t motor_subscriber;        // subscribe /cmd_encoder
-geometry_msgs__msg__Twist encoder_msg;
-
 rclc_executor_t executor;
 rclc_support_t support;
 rcl_allocator_t allocator;
@@ -68,20 +65,16 @@ float motor2RPM = 0;
 float motor3RPM = 0;
 float motor4RPM = 0;
 
-float GEAR_RATIO = 1.15;
-int PULSES_PER_REVOLUTION = 2500;
-
 // --- Distance/odometry state (meters/radians) ---
 double dist1 = 0.0, dist2 = 0.0, dist3 = 0.0, dist4 = 0.0;  // per-wheel accumulated distance
 double dist_left = 0.0, dist_right = 0.0, dist_avg = 0.0;   // left/right/average distance
 double theta_sum = 0.0;                                     // accumulated rotation (rad)
+double lastPosition1 = 0.0, lastPosition2 = 0.0, lastPosition3 = 0.0, lastPosition4 = 0.0;
+static int64_t prev1 = 0, prev2 = 0, prev3 = 0, prev4 = 0;
 
-// --- Encoder counting mode factor ---
 // Using attachHalfQuad() → counts x2
 // (if using attachFullQuad() instead, set this to 4)
 const int ENCODER_QUAD = 2;
-
-
 
 // ------ function list ------
 
@@ -91,6 +84,7 @@ bool createEntities();
 bool destroyEntities();
 void publishData();
 struct timespec getTime();
+
 void Move();
 void Encoder();
 
@@ -115,70 +109,54 @@ void setup()
     pinMode(MOTOR4_IN_A, OUTPUT);   // motor 4
     pinMode(MOTOR4_IN_B, OUTPUT);
 
-    if (MOTOR1_ENCODER_INV) encoder1.attachHalfQuad(MOTOR1_ENCODER_PIN_B, MOTOR1_ENCODER_PIN_A);
-    else encoder1.attachHalfQuad(MOTOR1_ENCODER_PIN_A, MOTOR1_ENCODER_PIN_B);
-    if (MOTOR2_ENCODER_INV) encoder2.attachHalfQuad(MOTOR2_ENCODER_PIN_B, MOTOR2_ENCODER_PIN_A);
-    else encoder2.attachHalfQuad(MOTOR2_ENCODER_PIN_A, MOTOR2_ENCODER_PIN_B);
-    if (MOTOR3_ENCODER_INV) encoder3.attachHalfQuad(MOTOR3_ENCODER_PIN_B, MOTOR3_ENCODER_PIN_A);
-    else encoder3.attachHalfQuad(MOTOR3_ENCODER_PIN_A, MOTOR3_ENCODER_PIN_B);
-    if (MOTOR4_ENCODER_INV) encoder4.attachHalfQuad(MOTOR4_ENCODER_PIN_B, MOTOR4_ENCODER_PIN_A);
-    else encoder4.attachHalfQuad(MOTOR4_ENCODER_PIN_A, MOTOR4_ENCODER_PIN_B);
+    pinMode(MOTOR1_ENCODER_PIN_A, INPUT_PULLUP);
+    pinMode(MOTOR1_ENCODER_PIN_B, INPUT_PULLUP);
+
+    pinMode(MOTOR2_ENCODER_PIN_A, INPUT_PULLUP);
+    pinMode(MOTOR2_ENCODER_PIN_B, INPUT_PULLUP);
+
+    pinMode(MOTOR3_ENCODER_PIN_A, INPUT_PULLUP);
+    pinMode(MOTOR3_ENCODER_PIN_B, INPUT_PULLUP);
+
+    pinMode(MOTOR4_ENCODER_PIN_A, INPUT_PULLUP);
+    pinMode(MOTOR4_ENCODER_PIN_B, INPUT_PULLUP);
+
+    encoder1.attachHalfQuad(MOTOR1_ENCODER_PIN_A, MOTOR1_ENCODER_PIN_B);
+    encoder2.attachHalfQuad(MOTOR2_ENCODER_PIN_A, MOTOR2_ENCODER_PIN_B);
+    encoder3.attachHalfQuad(MOTOR3_ENCODER_PIN_A, MOTOR3_ENCODER_PIN_B);
+    encoder4.attachHalfQuad(MOTOR4_ENCODER_PIN_A, MOTOR4_ENCODER_PIN_B);
+
+    // set zero at start
     encoder1.clearCount();
     encoder2.clearCount();
     encoder3.clearCount();
     encoder4.clearCount();
+
+    prev1 = prev2 = prev3 = prev4 = 0;
 }
 
 void loop() {
-  switch (state) {
-    case WAITING_AGENT:
-      EXECUTE_EVERY_N_MS(1500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 10)) ? AGENT_AVAILABLE : WAITING_AGENT;);
-      break;
-    case AGENT_AVAILABLE:
-      state = (true == createEntities()) ? AGENT_CONNECTED : WAITING_AGENT;
-      if (state == WAITING_AGENT) { destroyEntities(); }
-      break;
-    case AGENT_CONNECTED:
-      EXECUTE_EVERY_N_MS(500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 10)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
-      if (state == AGENT_CONNECTED) {void loop()
-{
-    switch (state)
-    {
-    case WAITING_AGENT:
-        EXECUTE_EVERY_N_MS(500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_AVAILABLE : WAITING_AGENT;);
+    switch (state) {
+        case WAITING_AGENT:
+        EXECUTE_EVERY_N_MS(1500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 10)) ? AGENT_AVAILABLE : WAITING_AGENT;);
         break;
-    case AGENT_AVAILABLE:
+        case AGENT_AVAILABLE:
         state = (true == createEntities()) ? AGENT_CONNECTED : WAITING_AGENT;
-        if (state == WAITING_AGENT)
-        {
-            destroyEntities();
+        if (state == WAITING_AGENT) { destroyEntities(); }
+        break;
+        case AGENT_CONNECTED:
+        EXECUTE_EVERY_N_MS(500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 10)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
+        if (state == AGENT_CONNECTED) {
+            rclc_executor_spin_some(&executor, RCL_MS_TO_NS(5));
         }
         break;
-    case AGENT_CONNECTED:
-        EXECUTE_EVERY_N_MS(200, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
-        if (state == AGENT_CONNECTED)
-        {
-            rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100));
-        }
-        break;
-    case AGENT_DISCONNECTED:
+        case AGENT_DISCONNECTED:
         destroyEntities();
         state = WAITING_AGENT;
         break;
-    default:
+        default:
         break;
     }
-}
-        rclc_executor_spin_some(&executor, RCL_MS_TO_NS(5));
-      }
-      break;
-    case AGENT_DISCONNECTED:
-      destroyEntities();
-      state = WAITING_AGENT;
-      break;
-    default:
-      break;
-  }
 }
 
 // ------ functions ------
@@ -201,6 +179,11 @@ void twistCallback(const void *msgin)
     motor_msg.linear.x = msg->linear.x;   // forward
     motor_msg.linear.y = msg->linear.y;   // strafe
     motor_msg.angular.z = msg->angular.z; // rotate
+}
+
+void twist2Callback(const void *msgin)
+{
+    prev_cmd_time = millis();
 }
 
 bool createEntities()       // create ROS entities 
@@ -228,10 +211,9 @@ bool createEntities()       // create ROS entities
         "/quin/cmd_move"));
 
     RCCHECK(rclc_publisher_init_best_effort(
-        &debug_encoder_publisher,
-        &node,
+        &debug_encoder_publisher, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-        "debug/cmd_encoder"));
+        "/quin/debug/encoder"));
 
     const unsigned int control_timeout = 20;
     RCCHECK(rclc_timer_init_default(
@@ -239,7 +221,7 @@ bool createEntities()       // create ROS entities
         RCL_MS_TO_NS(control_timeout), controlCallback));
 
     executor = rclc_executor_get_zero_initialized_executor();
-    RCCHECK(rclc_executor_init(&executor, &support.context, 3, &allocator));    // max handles = 7
+    RCCHECK(rclc_executor_init(&executor, &support.context, 5, &allocator));    // max handles = 7
 
     RCCHECK(rclc_executor_add_subscription(
         &executor, &motor_subscriber, &motor_msg, &twistCallback, ON_NEW_DATA));
@@ -256,9 +238,8 @@ bool destroyEntities()      // destroy ROS entities
     // (void)rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
 
     rcl_publisher_fini(&debug_motor_publisher, &node);
-    rcl_subscription_fini(&motor_subscriber, &node);
     rcl_publisher_fini(&debug_encoder_publisher, &node);
-    rcl_subscription_fini(&encoder_subscriber, &node);
+    rcl_subscription_fini(&motor_subscriber, &node);
     rcl_node_fini(&node);
     rcl_timer_fini(&control_timer);
     rclc_executor_fini(&executor);
@@ -273,7 +254,7 @@ void Move()
 
     // from geometry_msgs/Twist
     float Vx = motor_msg.linear.x;   // m/s
-    float Wz = motor_msg.angular.z;  // rad/s
+    float Wz = -motor_msg.angular.z;  // rad/s
 
     // Kinematics for differntial
     float wheel_left = Vx - (Wz * LR_WHEELS_DISTANCE * 0.5f);
@@ -380,64 +361,67 @@ void Move()
     debug_motor_msg.angular.x = wheel3_rpm;  // rear left
     debug_motor_msg.angular.y = wheel4_rpm;  // rear right
 
-
 }
 
 void Encoder() {
-    // track time (not needed for distance, but kept for consistency)
-    current_time = millis();
-    unsigned long time_diff = (current_time - lastTime);
-    lastTime = current_time;
+    // cumulative counts
+    const int64_t n1 = encoder1.getCount();
+    const int64_t n2 = encoder2.getCount();
+    const int64_t n3 = encoder3.getCount();
+    const int64_t n4 = encoder4.getCount();
 
-    // read incremental counts
-    long c1 = encoder1.getCount();
-    long c2 = encoder2.getCount();
-    long c3 = encoder3.getCount();
-    long c4 = encoder4.getCount();
+    // deltas since last call
+    int64_t c1 = n1 - prev1; prev1 = n1;
+    int64_t c2 = n2 - prev2; prev2 = n2;
+    int64_t c3 = n3 - prev3; prev3 = n3;
+    int64_t c4 = n4 - prev4; prev4 = n4;
 
-    // pulses per wheel revolution (encoder + counting mode + gear ratio)
-    const double counts_per_wheel_rev = (double)PULSES_PER_REVOLUTION * (double)ENCODER_QUAD * (double)GEAR_RATIO;
-    const double wheel_circumference = (double)WHEEL_DIAMETER * M_PI;  // meters
+    // optional sign flips
+    if (MOTOR1_ENCODER_INV) c1 = -c1;
+    if (MOTOR2_ENCODER_INV) c2 = -c2;
+    if (MOTOR3_ENCODER_INV) c3 = -c3;
+    if (MOTOR4_ENCODER_INV) c4 = -c4;
 
-    // convert to distance increment (m)
-    const double d1 = ((double)c1 / counts_per_wheel_rev) * wheel_circumference;
-    const double d2 = ((double)c2 / counts_per_wheel_rev) * wheel_circumference;
-    const double d3 = ((double)c3 / counts_per_wheel_rev) * wheel_circumference;
-    const double d4 = ((double)c4 / counts_per_wheel_rev) * wheel_circumference;
+    // counts per WHEEL rev (include gearbox only if encoder on motor)
+    const double counts_per_wheel_rev =
+        (double)PULSES_PER_REVOLUTION * (double)ENCODER_QUAD * (double)GEAR_RATIO;
+
+    const double wheel_circumference = (double)WHEEL_DIAMETER * M_PI; // m
+    const double dist_per_tick = wheel_circumference / counts_per_wheel_rev;
+
+    // per-wheel distance increments
+    const double d1 = (double)c1 * dist_per_tick;
+    const double d2 = (double)c2 * dist_per_tick;
+    const double d3 = (double)c3 * dist_per_tick;
+    const double d4 = (double)c4 * dist_per_tick;
 
     // accumulate wheel distances
     dist1 += d1;  dist2 += d2;  dist3 += d3;  dist4 += d4;
 
-    // left/right increments (average of front+rear per side)
-    const double dL = 0.5 * (d1 + d3);  // left  = wheel1 (front-left) + wheel3 (rear-left)
-    const double dR = 0.5 * (d2 + d4);  // right = wheel2 (front-right) + wheel4 (rear-right)
+    // side increments & chassis odom
+    const double dL = 0.5 * (d1 + d3);   // left: FL + RL
+    const double dR = 0.5 * (d2 + d4);   // right: FR + RR
 
-    // accumulate chassis odometry
-    dist_left  += dL;   
-    dist_right += dR;   
+    dist_left  += dL;
+    dist_right += dR;
     dist_avg    = 0.5 * (dist_left + dist_right);
 
-    // accumulate orientation (rad)
+    // yaw from differential kinematics
     theta_sum += (dR - dL) / (double)LR_WHEELS_DISTANCE;
 
-    // reset encoder counters to measure increments again
-    encoder1.clearCount();
-    encoder2.clearCount();
-    encoder3.clearCount();
-    encoder4.clearCount();
+    // fill encoder debug message
+    debug_encoder_msg.linear.x  = (float)dist_left;                 // [m]
+    debug_encoder_msg.linear.y  = (float)dist_right;                // [m]
+    debug_encoder_msg.linear.z  = (float)dist_avg;                  // [m]
+    debug_encoder_msg.angular.z = (float)theta_sum;                 // [rad]
 }
 
 void publishData()
 {
     debug_motor_msg.linear.x = motor_msg.linear.x;   // m/s
     debug_motor_msg.angular.z = motor_msg.angular.z; // rad/s
-
-    debug_encoder_msg.linear.x  = (float)dist_left;     //   linear.x = left wheel distance (m)
-    debug_encoder_msg.linear.y  = (float)dist_right;    //   linear.y = right wheel distance (m)
-    debug_encoder_msg.linear.z  = (float)dist_avg;      //   linear.z = average distance (m)
-    debug_encoder_msg.angular.z = (float)theta_sum;     //   angular.z = accumulated rotation (rad)
-
     rcl_publish(&debug_motor_publisher, &debug_motor_msg, NULL);
+
     rcl_publish(&debug_encoder_publisher, &debug_encoder_msg, NULL);
 }
 

@@ -86,9 +86,6 @@ float motor2RPM = 0;
 float motor3RPM = 0;
 float motor4RPM = 0;
 
-float GEAR_RATIO = 1.15;
-int PULSES_PER_REVOLUTION = 2500;
-
 // --- Distance/odometry state (meters/radians) ---
 double dist1 = 0.0, dist2 = 0.0, dist3 = 0.0, dist4 = 0.0;  // per-wheel accumulated distance
 double dist_left = 0.0, dist_right = 0.0, dist_avg = 0.0;   // left/right/average distance
@@ -124,6 +121,31 @@ void setup()
     else encoder3.attachHalfQuad(MOTOR3_ENCODER_PIN_A, MOTOR3_ENCODER_PIN_B);
     if (MOTOR4_ENCODER_INV) encoder4.attachHalfQuad(MOTOR4_ENCODER_PIN_B, MOTOR4_ENCODER_PIN_A);
     else encoder4.attachHalfQuad(MOTOR4_ENCODER_PIN_A, MOTOR4_ENCODER_PIN_B);
+
+    // Motor 1
+    // if (MOTOR1_ENCODER_INV)
+    //     encoder1.attachHalfQuad(MOTOR1_ENCODER_PIN_B, MOTOR1_ENCODER_PIN_A);
+    // else
+    //     encoder1.attachHalfQuad(MOTOR1_ENCODER_PIN_A, MOTOR1_ENCODER_PIN_B);
+
+    // // Motor 2
+    // if (MOTOR2_ENCODER_INV)
+    //     encoder2.attachHalfQuad(MOTOR2_ENCODER_PIN_B, MOTOR2_ENCODER_PIN_A);
+    // else
+    //     encoder2.attachHalfQuad(MOTOR2_ENCODER_PIN_A, MOTOR2_ENCODER_PIN_B);
+
+    // // Motor 3
+    // if (MOTOR3_ENCODER_INV)
+    //     encoder3.attachHalfQuad(MOTOR3_ENCODER_PIN_B, MOTOR3_ENCODER_PIN_A);
+    // else
+    //     encoder3.attachHalfQuad(MOTOR3_ENCODER_PIN_A, MOTOR3_ENCODER_PIN_B);
+
+    // // Motor 4
+    // if (MOTOR4_ENCODER_INV)
+    //     encoder4.attachHalfQuad(MOTOR4_ENCODER_PIN_B, MOTOR4_ENCODER_PIN_A);
+    // else
+    //     encoder4.attachHalfQuad(MOTOR4_ENCODER_PIN_A, MOTOR4_ENCODER_PIN_B);
+
     encoder1.clearCount();
     encoder2.clearCount();
     encoder3.clearCount();
@@ -142,35 +164,7 @@ void loop() {
       break;
     case AGENT_CONNECTED:
       EXECUTE_EVERY_N_MS(500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 10)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
-      if (state == AGENT_CONNECTED) {void loop()
-{
-    switch (state)
-    {
-    case WAITING_AGENT:
-        EXECUTE_EVERY_N_MS(500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_AVAILABLE : WAITING_AGENT;);
-        break;
-    case AGENT_AVAILABLE:
-        state = (true == createEntities()) ? AGENT_CONNECTED : WAITING_AGENT;
-        if (state == WAITING_AGENT)
-        {
-            destroyEntities();
-        }
-        break;
-    case AGENT_CONNECTED:
-        EXECUTE_EVERY_N_MS(200, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
-        if (state == AGENT_CONNECTED)
-        {
-            rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100));
-        }
-        break;
-    case AGENT_DISCONNECTED:
-        destroyEntities();
-        state = WAITING_AGENT;
-        break;
-    default:
-        break;
-    }
-}
+      if (state == AGENT_CONNECTED) {
         rclc_executor_spin_some(&executor, RCL_MS_TO_NS(5));
       }
       break;
@@ -318,9 +312,9 @@ void flashLED(int n_times)
 
 void Encoder() {
     // track time (not needed for distance, but kept for consistency)
-    current_time = millis();
-    unsigned long time_diff = (current_time - lastTime);
-    lastTime = current_time;
+    // current_time = millis();
+    // unsigned long time_diff = (current_time - lastTime);
+    // lastTime = current_time;
 
     // read incremental counts
     long c1 = encoder1.getCount();
@@ -358,6 +352,12 @@ void Encoder() {
     encoder2.clearCount();
     encoder3.clearCount();
     encoder4.clearCount();
+
+        // Prepare message fields (will publish in publishData)
+    debug_encoder_msg.linear.x  = (float)dist_left;                    // left distance [m]
+    debug_encoder_msg.linear.y  = (float)dist_right;                   // right distance [m]
+    debug_encoder_msg.linear.z  = (float)((dist_left+ dist_right) * 0.5); // average [m]
+    debug_encoder_msg.angular.z = (float)theta_sum;                     // yaw [rad]
 }
 
 
