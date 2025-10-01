@@ -4,6 +4,9 @@
 #define DRILL_STEP_PIN_DIR  25
 #define DRILL_STEP_PIN_PLS  26
 
+// Stepper speed (RPM). 8–12 is safe for 28BYJ-48
+#define STEPPER_RPM   10
+
 static const float STEPS_PER_MM = 40.0f;            // set correctly for your mechanism!
 
 static const float PRESS_TRAVEL_MM = 200.0f;        // 20 cm

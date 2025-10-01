@@ -42,7 +42,7 @@ class Cmd_vel_to_motor_speed(Node):
 
         self.BTN_CIRCLE = 1
         self.BTN_SQUARE = 3
-        self.BTN_R1 = 5
+        self.BTN_R1 = 4
 
 
         # self.previous_manual_turn = time.time()
@@ -118,6 +118,13 @@ class Cmd_vel_to_motor_speed(Node):
 
         print(f"Left Motor: {self.motor1Speed:.2f} RPM, Right Motor: {self.motor2Speed:.2f} RPM")
 
+    def cmd_encoder(self, msg):
+
+        tick_per_revolution = 60
+        diameter = 85  # mm
+        circumference = math.pi * diameter  # mm
+
+        self.rack_distance += mm_to_cm((msg.linear.z / tick_per_revolution) * circumference)
     
     def cmd_spin(self, msg):
         
@@ -136,7 +143,7 @@ class Cmd_vel_to_motor_speed(Node):
 
     def cmd_drill(self, msg):
 
-        r1 = (len(msg.buttons) > self.BTN_R1 and msg.buttons[self.BTN_R1] == 1)
+        l1 = (len(msg.buttons) > self.BTN_R1 and msg.buttons[self.BTN_R1] == 1)
 
         # Edge-detect without editing __init__
         if not hasattr(self, "_prev_drill_pressed"):

@@ -50,7 +50,7 @@ enum states
     AGENT_DISCONNECTED   // 3
 } state;
 
-Stepper myStepper(STEPS_PER_REV, DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR);
+Stepper myStepper(STEPS_PER_MM, DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR);
 volatile long remaining_steps = 0;
 int last_dir = 0;
 
@@ -70,9 +70,7 @@ void setup()
     Serial.begin(115200);
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
 
-    stepper.setMaxSpeed(MAX_SPEED_STEPS_S);   // steps/sec
-    stepper.setAcceleration(ACCEL_STEPS_S2);  // steps/sec^2
-    stepper.setCurrentPosition(0);            // 0 = top
+    myStepper.setSpeed(STEPPER_RPM); 
 }
 
 void loop() {
@@ -173,6 +171,11 @@ bool destroyEntities()      // destroy ROS entities
 
 void Drill()
 {
+  // keep state inside the function to avoid editing globals
+  static bool prev_pressed   = false;
+  static bool move_down_next = true;   // toggle each press
+  static long current_steps  = 0;      // 0 = top; + = down
+
   const float z = drill_msg.linear.z;
   const bool pressed_now = (fabsf(z) >= PRESS_THRESH);
   const bool rising_edge = pressed_now && !prev_pressed;
@@ -182,26 +185,30 @@ void Drill()
     const long steps_per_press = lroundf(PRESS_TRAVEL_MM * STEPS_PER_MM);
     const long max_steps       = (MAX_TRAVEL_MM > 0) ? lroundf(MAX_TRAVEL_MM * STEPS_PER_MM) : LONG_MAX;
 
-    // current signed position: 0 = top, +down
-    long cur = stepper.currentPosition();
-    long tgt = cur;
+    long cur = current_steps;
 
     if (move_down_next) {
-      // Move DOWN (positive direction)
-      long down_room = max_steps - cur;                  // remaining room to bottom
-      long delta     = steps_per_press <= down_room ? steps_per_press : down_room;
-      tgt = cur + delta;
-      move_down_next = false;                            // next time go up
-    } else {
-      // Move UP (negative direction)
-      long up_room = cur;                                // distance to top (0)
-      long delta   = steps_per_press <= up_room ? steps_per_press : up_room;
-      tgt = cur - delta;
-      move_down_next = true;                             // next time go down
-    }
+      // DOWN movement (+ direction)
+      long down_room    = max_steps - cur;                          // how many steps left to bottom
+      long steps_to_do  = (down_room < steps_per_press) ? down_room : steps_per_press;
 
-    // Set target (clamped implicitly by delta above)
-    stepper.moveTo(tgt);
+      if (steps_to_do > 0) {
+        // Stepper.step() blocks until done; sign = direction
+        myStepper.step( steps_to_do );                               // positive = one direction
+        current_steps += steps_to_do;
+      }
+      move_down_next = false;
+    } else {
+      // UP movement (− direction)
+      long up_room     = cur;                                        // distance to top (0)
+      long steps_to_do = (up_room < steps_per_press) ? up_room : steps_per_press;
+
+      if (steps_to_do > 0) {
+        myStepper.step( -steps_to_do );                              // negative = opposite direction
+        current_steps -= steps_to_do;
+      }
+      move_down_next = true;
+    }
   }
 
   prev_pressed = pressed_now;
@@ -209,6 +216,7 @@ void Drill()
   // debug out
   debug_drill_msg.linear.z = drill_msg.linear.z;
 }
+
 
 
 
