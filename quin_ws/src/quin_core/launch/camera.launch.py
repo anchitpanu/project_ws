@@ -17,10 +17,10 @@ def generate_launch_description():
         parameters=[{
             'video_device': '/dev/video0',
             'camera_name': 'usb_cam',
-            'image_size': [640, 480],
+            'image_size': [320, 240],
             'pixel_format': 'YUYV',  
             'output_encoding': 'yuv422_yuy2',
-            'time_per_frame': [1, 30]  # 30 FPS
+            'time_per_frame': [1, 10]  # 30 FPS
         }],
         remappings=[
             ('/image_raw', '/quin/image_raw'),
