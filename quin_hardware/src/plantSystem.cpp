@@ -59,8 +59,8 @@ enum states
 } state;
 
 
-Stepper myStepper(STEPS_PER_REV, SPIN_STEP_PIN_PLS, SPIN_STEP_PIN_DIR);
-Stepper myStepper(STEPS_PER_CM, DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR);
+Stepper spinStepper(STEPS_PER_REV, SPIN_STEP_PIN_PLS, SPIN_STEP_PIN_DIR);
+Stepper drillStepper(STEPS_PER_CM, DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR);
 
 // Movement queue: remaining steps to execute (positive or negative)
 volatile long remaining_steps = 0;
@@ -79,6 +79,7 @@ bool destroyEntities();
 void publishData();
 struct timespec getTime();
 void Spin();
+void Drill();
 
 // ------ main ------
 
@@ -88,7 +89,8 @@ void setup()
     Serial.begin(115200);
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
 
-    myStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
+    spinStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
+    drillStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
 }
 
 void loop() {

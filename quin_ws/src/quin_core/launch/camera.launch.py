@@ -16,22 +16,40 @@ def generate_launch_description():
     # }
 
     # ---- OPTION B: HD, MJPEG from camera (recommended over Wi-Fi) ----
-    hd_params = {
+    # Camera: use YUYV (supported), convert to bgr8
+    cam_params = {
         'video_device': '/dev/video0',
         'camera_name': 'usb_cam',
-        'image_size': [1280, 720],        # try [1920, 1080] if supported
-        'pixel_format': 'YUYV',         # Jazzy supports: YUYV, UYVY, GREY
-        # v4l2_camera will decode to RGB/BGR internally for /image_raw.
-        # (Keep default output_encoding, or set to 'bgr8' if you prefer.)
-        'output_encoding': 'bgr8',     # <- avoid empty encoding; cv_bridge-safe
-        'time_per_frame': [1, 30],        # 30 FPS
+        'image_size': [1280, 720],     # try [960, 540] if Wi-Fi is weak
+        'pixel_format': 'YUYV',        # <- supported; avoids MJPG crash
+        'output_encoding': 'bgr8',
+        'time_per_frame': [1, 30],     # 30 FPS
+    }
+
+    qos_overrides = {
+        '/image_raw': {
+            'publisher': {
+                'reliability': 'best_effort',
+                'history': 'keep_last',
+                'depth': 5,
+                'durability': 'volatile'
+            }
+        },
+        '/camera_info': {
+            'publisher': {
+                'reliability': 'best_effort',
+                'history': 'keep_last',
+                'depth': 5,
+                'durability': 'volatile'
+            }
+        }
     }
 
     camera_driver = Node(
         package='v4l2_camera',
         executable='v4l2_camera_node',
         name='camera',
-        parameters=[hd_params],            # <— choose hd_params or sd_params
+        parameters=[cam_params, {'qos_overrides': qos_overrides}],
         remappings=[
             ('/image_raw', '/quin/image_raw'),
             ('/camera_info', '/quin/camera_info'),

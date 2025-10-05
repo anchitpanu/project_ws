@@ -1,27 +1,6 @@
 khi's joy : 5D:B2:2E:D1:2E:D9
 
-esp32 pin
-    FRONT
-MOTOR1  MOTOR3
-MOTOR2  MOTOR4
-    BACK
+quin's pi-ip: 10.50.232.237
 
-motor1_encoderA 25
-motor1_encoderB 26
-motor1_motor1 32
-motor1_motor2 33
-
-motor2_encoderA 14
-motor2_encoderB 12
-motor2_motor1 34
-motor2_motor2 35
-
-motor3_encoderA 19
-motor3_encoderB 18
-motor3_motor1 16
-motor3_motor2 17
-
-motor4_encoderA 15
-motor4_encoderB 13
-motor4_motor1 22
-motor4_motor2 23
+monitor camera: ros2 run web_video_server web_video_server
+web: http://10.50.232.237:8080/stream?topic=/quin/image_raw

@@ -148,8 +148,9 @@ class Joystick(Node):
 
         self.gamepad = Gamepad()
         self.maxspeed : float = 1.0
-        
 
+        self._prev_drill_pressed = False
+        self._drill_reset_due = 0.0
 
         self.sent_data_timer = self.create_timer(0.01, self.sendData)
 
@@ -185,16 +186,15 @@ class Joystick(Node):
         
         #Macro-----------------------------------------------------------
         
-        self.gamepad.update_drill()
+        # self.gamepad.update_drill()
         self.gamepad.update_gripper()
         self.gamepad.update_toggle_encoder()
 
         # press=1 release=0
         self.gamepad.spin     = bool(self.gamepad.button_circle) 
-        self.gamepad.spinback = bool(self.gamepad.button_square)   
+        self.gamepad.spinback = bool(self.gamepad.button_square)
+        self.gamepad.drill    = bool(self.gamepad.l1)   
 
-    
-        
         if self.gamepad.button_logo:
             self.gamepad.reset_toggles()
 
@@ -229,6 +229,31 @@ class Joystick(Node):
         else:
             cmd_drill.linear.z = 0.0          # Stop
         self.pub_drill.publish(cmd_drill)
+
+
+        # cmd_drill = Twist()
+
+        # if pressed and not self._prev_drill_pressed:
+        #     msg.linear.z = 1.0
+        #     self.pub_drill.publish(cmd_drill)
+        #     # auto reset to zero after 50 ms
+        #     self._drill_reset_due = now + 0.05
+
+        # # If reset is due, publish exactly one 0.0 and clear the flag
+        # if self._drill_reset_due and now >= self._drill_reset_due:
+        #     self._drill_reset_due = 0.0
+        #     self.pub_drill.publish(cmd_drill)
+
+        # self._prev_drill_pressed = pressed
+
+        # drill command: -1/0/+1 on linear.z
+        # cmd_drill = Twist()
+        
+        # if self.gamepad.drill:
+        #     cmd_drill.linear.z = +1.0         # l1: drill down
+        # else:
+        #     cmd_drill.linear.z = 0.0          # Stop
+        # self.pub_drill.publish(cmd_drill)
 
 
         if self.gamepad.toggle_encoder_bool:
