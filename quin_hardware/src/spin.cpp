@@ -51,7 +51,7 @@ enum states
 } state;
 
 
-Stepper myStepper(STEPS_PER_REV, PLS_PIN, DIR_PIN);
+Stepper myStepper(STEPS_PER_REV, SPIN_STEP_PIN_PLS, SPIN_STEP_PIN_DIR);
 
 // Movement queue: remaining steps to execute (positive or negative)
 volatile long remaining_steps = 0;
@@ -189,22 +189,22 @@ void Spin()
     const float z = spin_msg.angular.z;
 
     if (z > TWIST_THRESH && last_dir != 1) {
-      digitalWrite(DIR_PIN, HIGH);          // press = clockwise 36 degree
+      digitalWrite(SPIN_STEP_PIN_DIR, HIGH);          // press = clockwise 36 degree
       for (int i = 0; i < STEPS_PER_36; i++) {
-        digitalWrite(PLS_PIN, HIGH);
+        digitalWrite(SPIN_STEP_PIN_PLS, HIGH);
         delayMicroseconds(STEP_PULSE_HIGH_US);               // adjust speed here (lower = faster)
-        digitalWrite(PLS_PIN, LOW);
+        digitalWrite(SPIN_STEP_PIN_PLS, LOW);
         delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
       }
       last_dir = 1;                         // prevent re-trigger until direction changes
     } 
     
     else if (z < -TWIST_THRESH && last_dir != -1) {
-      digitalWrite(DIR_PIN, LOW);           // press = counter-clockwise 36 degree
+      digitalWrite(SPIN_STEP_PIN_DIR, LOW);           // press = counter-clockwise 36 degree
       for (int i = 0; i < STEPS_PER_36; i++) {
-        digitalWrite(PLS_PIN, HIGH);
+        digitalWrite(SPIN_STEP_PIN_PLS, HIGH);
         delayMicroseconds(STEP_PULSE_HIGH_US);
-        digitalWrite(PLS_PIN, LOW);
+        digitalWrite(SPIN_STEP_PIN_PLS, LOW);
         delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
       }
       last_dir = -1;
@@ -214,7 +214,7 @@ void Spin()
       last_dir = 0;  // reset edge detection
     }
 
-    debug_spin_msg.angular.z = z;
+    debug_spin_msg.angular.z = spin_msg.angular.z;
 }
 
 void publishData()

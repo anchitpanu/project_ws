@@ -98,6 +98,7 @@ class Cmd_vel_to_motor_speed(Node):
     def encoder(self,msg):
         self.encoder_mode = msg.linear.x    # 1 Bit, 2 RPM
 
+
     def cmd_move(self, msg):
 
         self.moveSpeed = msg.linear.y               # Forward/Backward
@@ -118,6 +119,7 @@ class Cmd_vel_to_motor_speed(Node):
 
         print(f"Left Motor: {self.motor1Speed:.2f} RPM, Right Motor: {self.motor2Speed:.2f} RPM")
 
+
     def cmd_encoder(self, msg):
 
         tick_per_revolution = 60
@@ -126,6 +128,7 @@ class Cmd_vel_to_motor_speed(Node):
 
         self.rack_distance += mm_to_cm((msg.linear.z / tick_per_revolution) * circumference)
     
+
     def cmd_spin(self, msg):
         
         circle = (len(msg.buttons) > self.BTN_CIRCLE and msg.buttons[self.BTN_CIRCLE] == 1)
@@ -143,18 +146,18 @@ class Cmd_vel_to_motor_speed(Node):
 
     def cmd_drill(self, msg):
 
-        l1 = (len(msg.buttons) > self.BTN_R1 and msg.buttons[self.BTN_R1] == 1)
+        l1 = (len(msg.buttons) > self.BTN_L1 and msg.buttons[self.BTN_L1] == 1)
 
         # Edge-detect without editing __init__
         if not hasattr(self, "_prev_drill_pressed"):
             self._prev_drill_pressed = False
 
-        if r1 and not self._prev_drill_pressed:
+        if l1 and not self._prev_drill_pressed:
             # Emit a short pulse: 1.0 then auto-reset to 0.0
             self.motordrillSpeed = 1.0
             threading.Timer(0.05, lambda: setattr(self, "motordrillSpeed", 0.0)).start()
 
-        self._prev_drill_pressed = r1
+        self._prev_drill_pressed = l1
         
 
     def cmd_gripper(self, msg):

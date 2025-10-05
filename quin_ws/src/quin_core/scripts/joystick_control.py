@@ -240,6 +240,8 @@ class Joystick(Node):
         self.pub_encoder.publish(cmd_encoder)
         self.pub_move.publish(cmd_vel_move)
 
+        cmd_gripper = Twist()
+
 
 def main():
     rclpy.init()

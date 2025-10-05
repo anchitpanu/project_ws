@@ -13,6 +13,7 @@
 #include <ESP32Encoder.h>
 #include <Stepper.h>
 
+#include "../config/spin.h" 
 #include "../config/digging.h" 
 
 
@@ -24,11 +25,18 @@
 
 // -------- ROS entities --------
 
+rcl_publisher_t debug_spin_publisher;
+geometry_msgs__msg__Twist debug_spin_msg;
+
 rcl_publisher_t debug_drill_publisher;
 geometry_msgs__msg__Twist debug_drill_msg;
 
+rcl_subscription_t spin_subscriber;        // subscribe /cmd_spin
+geometry_msgs__msg__Twist spin_msg;
+
 rcl_subscription_t drill_subscriber;        // subscribe /cmd_drill
 geometry_msgs__msg__Twist drill_msg;
+
 
 rclc_executor_t executor;
 rclc_support_t support;
@@ -46,23 +54,33 @@ enum states
 {
     WAITING_AGENT,       // 0
     AGENT_AVAILABLE,     // 1
-    AGENT_CONNECTED,     // 2 
+    AGENT_CONNECTED,     // 2
     AGENT_DISCONNECTED   // 3
 } state;
 
+
+Stepper myStepper(STEPS_PER_REV, SPIN_STEP_PIN_PLS, SPIN_STEP_PIN_DIR);
 Stepper myStepper(STEPS_PER_CM, DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR);
+
+// Movement queue: remaining steps to execute (positive or negative)
 volatile long remaining_steps = 0;
+
+// Edge-detection state for joystick direction
+// -1 = last was LEFT, 0 = neutral, 1 = RIGHT
 int last_dir = 0;
 
-// ---------------- Function prototypes ----------------
+
+// ------ function list ------
+
 void rclErrorLoop();
 void syncTime();
 bool createEntities();
 bool destroyEntities();
 void publishData();
 struct timespec getTime();
-void Drill();
+void Spin();
 
+// ------ main ------
 
 void setup()
 {
@@ -70,7 +88,7 @@ void setup()
     Serial.begin(115200);
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
 
-    myStepper.setSpeed(STEPPER_RPM); 
+    myStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
 }
 
 void loop() {
@@ -97,11 +115,14 @@ void loop() {
   }
 }
 
+// ------ functions ------
+
 void controlCallback(rcl_timer_t *timer, int64_t last_call_time)
 {
     RCLC_UNUSED(last_call_time);
     if (timer != NULL)
     {
+        Spin();
         Drill();
         publishData();
     }
@@ -111,12 +132,20 @@ void twistCallback(const void *msgin)
 {   
     const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
     prev_cmd_time = millis();
-    drill_msg.linear.z = msg->linear.z;
+    spin_msg.angular.z = msg->angular.z; // rotate
+}
+
+void twist2Callback(const void *msgin)
+{   
+    const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
+    prev_cmd_time = millis();
+    spin_msg.angular.z = msg->angular.z; // rotate
 }
 
 bool createEntities()       // create ROS entities 
 {
     allocator = rcl_get_default_allocator();    // manage memory of micro-Ros
+    geometry_msgs__msg__Twist__init(&debug_spin_msg);
     geometry_msgs__msg__Twist__init(&debug_drill_msg);
 
     init_options = rcl_get_zero_initialized_init_options();
@@ -128,9 +157,19 @@ bool createEntities()       // create ROS entities
     RCCHECK(rclc_node_init_default(&node, "quin_robot_node", "", &support));
 
     RCCHECK(rclc_publisher_init_best_effort(
+        &debug_spin_publisher, &node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+        "/quin/debug/spin"));
+
+    RCCHECK(rclc_publisher_init_best_effort(
         &debug_drill_publisher, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
         "/quin/debug/drill"));
+
+    RCCHECK(rclc_subscription_init_best_effort(
+        &spin_subscriber, &node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+        "/quin/cmd_spin"));
 
     RCCHECK(rclc_subscription_init_best_effort(
         &drill_subscriber, &node,
@@ -146,7 +185,10 @@ bool createEntities()       // create ROS entities
     RCCHECK(rclc_executor_init(&executor, &support.context, 3, &allocator));    // max handles = 3
 
     RCCHECK(rclc_executor_add_subscription(
-        &executor, &drill_subscriber, &drill_msg, &twistCallback, ON_NEW_DATA));
+        &executor, &spin_subscriber, &spin_msg, &twistCallback, ON_NEW_DATA));
+
+    RCCHECK(rclc_executor_add_subscription(
+        &executor, &drill_subscriber, &drill_msg, &twist2Callback, ON_NEW_DATA));
 
     RCCHECK(rclc_executor_add_timer(&executor, &control_timer));
     syncTime();
@@ -159,6 +201,8 @@ bool destroyEntities()      // destroy ROS entities
     // rmw_context_t *rmw_context = rcl_context_get_rmw_context(&support.context);
     // (void)rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
 
+    rcl_publisher_fini(&debug_spin_publisher, &node);
+    rcl_subscription_fini(&spin_subscriber, &node);
     rcl_publisher_fini(&debug_drill_publisher, &node);
     rcl_subscription_fini(&drill_subscriber, &node);
     rcl_node_fini(&node);
@@ -167,6 +211,39 @@ bool destroyEntities()      // destroy ROS entities
     rclc_support_fini(&support);
 
     return true;
+}
+
+void Spin()
+{
+    const float z = spin_msg.angular.z;
+
+    if (z > TWIST_THRESH && last_dir != 1) {
+      digitalWrite(SPIN_STEP_PIN_DIR, HIGH);          // press = clockwise 36 degree
+      for (int i = 0; i < STEPS_PER_36; i++) {
+        digitalWrite(SPIN_STEP_PIN_PLS, HIGH);
+        delayMicroseconds(STEP_PULSE_HIGH_US);               // adjust speed here (lower = faster)
+        digitalWrite(SPIN_STEP_PIN_PLS, LOW);
+        delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
+      }
+      last_dir = 1;                         // prevent re-trigger until direction changes
+    } 
+    
+    else if (z < -TWIST_THRESH && last_dir != -1) {
+      digitalWrite(SPIN_STEP_PIN_DIR, LOW);           // press = counter-clockwise 36 degree
+      for (int i = 0; i < STEPS_PER_36; i++) {
+        digitalWrite(SPIN_STEP_PIN_PLS, HIGH);
+        delayMicroseconds(STEP_PULSE_HIGH_US);
+        digitalWrite(SPIN_STEP_PIN_PLS, LOW);
+        delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
+      }
+      last_dir = -1;
+    }
+    
+    else if (fabs(z) < TWIST_DEADZONE) {
+      last_dir = 0;  // reset edge detection
+    }
+
+    debug_spin_msg.angular.z = spin_msg.angular.z;
 }
 
 void Drill()
@@ -209,8 +286,10 @@ void Drill()
 
 void publishData()
 {
-    debug_drill_msg.linear.z = drill_msg.linear.z;
+    debug_spin_msg.angular.z = spin_msg.angular.z;
+    rcl_publish(&debug_spin_publisher, &debug_spin_msg, NULL);
 
+    debug_drill_msg.linear.z = drill_msg.linear.z;
     rcl_publish(&debug_drill_publisher, &debug_drill_msg, NULL);
 }
 
@@ -249,3 +328,7 @@ void rclErrorLoop() {
 
     ESP.restart();
 }
+
+
+
+

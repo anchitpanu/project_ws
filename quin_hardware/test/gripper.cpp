@@ -66,7 +66,6 @@ struct timespec getTime();
 void Gripper();
 
 
-
 void setup()
 {
   myServo.attach(9);   // attach servo signal pin to D9
