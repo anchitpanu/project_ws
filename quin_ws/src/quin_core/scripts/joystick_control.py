@@ -43,7 +43,9 @@ class Gamepad:
         self.spin: bool = False
         self.spinback: bool = False
         self.gripper: bool = False
+        self.encoder_reset: bool = False
         self.toggle_encoder_bool : bool = False
+    
 
         self.previous_triangle_state = False
         self.previous_circle_state = False
@@ -103,6 +105,13 @@ class Gamepad:
                 self.last_macro_button = None
         self.previous_r1_state = self.r1
 
+    def update_encoder_reset(self):
+        if self.button_triangle and not self.previous_triangle_state:
+            self.encoderReset = True
+        else:
+            self.encoderReset = False
+        self.previous_triangle_state = self.button_triangle
+
     def update_toggle_encoder(self):
         if self.PressedRightAnalog and not self.previous_PressedRightAnalog_state:
             self.toggle_encoder_bool = not self.toggle_encoder_bool
@@ -140,6 +149,10 @@ class Joystick(Node):
 
         self.pub_encoder = self.create_publisher(
             Twist, "/quin/cmd_encoder", qos_profile=qos.qos_profile_system_default
+        )
+
+        self.pub_encoder_reset = self.create_publisher(
+            Twist, "/quin/cmd_encode/reset", qos_profile=qos.qos_profile_system_default
         )
 
         self.create_subscription(
@@ -186,16 +199,17 @@ class Joystick(Node):
         #Macro-----------------------------------------------------------
         
         # self.gamepad.update_drill()
-        self.gamepad.update_gripper()
+        # self.gamepad.update_gripper()
         self.gamepad.update_toggle_encoder()
 
         # press=1 release=0
         self.gamepad.spin     = bool(self.gamepad.button_circle) 
         self.gamepad.spinback = bool(self.gamepad.button_square)   
-        self.gamepad.drill    = bool(self.gamepad.l1)   
-
+        self.gamepad.drill    = bool(self.gamepad.l1)
+        self.gamepad.gripper  = bool(self.gamepad.r1)
+        self.gamepad.encoderReset = bool(self.gamepad.button_triangle) 
     
-        
+
         if self.gamepad.button_logo:
             self.gamepad.reset_toggles()
 
@@ -208,6 +222,7 @@ class Joystick(Node):
 
         cmd_vel_move.linear.x = float(self.gamepad.ly * self.maxspeed)
         cmd_vel_move.angular.z = float(self.gamepad.rx * self.maxspeed)
+
 
         # spin command: -1/0/+1 on angular.z
         cmd_spin = Twist()
@@ -222,14 +237,20 @@ class Joystick(Node):
             cmd_spin.angular.z = 0.0          # Stop
         self.pub_spin.publish(cmd_spin)
 
+
         # drill command: -1/0/+1 on linear.z
         cmd_drill = Twist()
-        
+
         if self.gamepad.drill:
             cmd_drill.linear.z = +1.0         # l1: drill down
         else:
             cmd_drill.linear.z = 0.0          # Stop
         self.pub_drill.publish(cmd_drill)
+        
+
+        if self.gamepad.encoder_reset:
++            self.pub_encoder_reset.publish(Empty())
++            self.gamepad.encoder_reset = False
 
 
         if self.gamepad.toggle_encoder_bool:
@@ -240,6 +261,7 @@ class Joystick(Node):
 
         self.pub_encoder.publish(cmd_encoder)
         self.pub_move.publish(cmd_vel_move)
+        self.pub_gripper.publish(cmd_gripper)
 
 
 def main():

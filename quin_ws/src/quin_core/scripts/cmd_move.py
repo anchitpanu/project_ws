@@ -38,6 +38,12 @@ class Cmd_vel_to_motor_speed(Node):
         self.motorspin1Speed: float = 0.0
         self.motordrillSpeed: float = 0.0
 
+        # encoder/range state you may want to zero on reset
+        self.encoder_mode = 1.0          # 1=Bit, 2=RPM (default)
+        self.rack_distance = 0.0         # example accumulated distance (cm)
+        self.left_ticks_offset = 0       # if you track offsets, zero them here
+        self.right_ticks_offset = 0
+
         self.servo_angle : float = 0.0
 
         self.BTN_CIRCLE = 1
@@ -89,6 +95,10 @@ class Cmd_vel_to_motor_speed(Node):
             Twist, "/quin/cmd_encoder", self.encoder, qos_profile=qos.qos_profile_sensor_data
         )
 
+        self.create_subscription(
+            Twist, "/quin/cmd_encoder_reset", self.encoder_reset, qos_profile=qos.qos_profile_system_default
+        )
+
         self.sent_data_timer = self.create_timer(0.01, self.sendData)
         
 
@@ -127,6 +137,19 @@ class Cmd_vel_to_motor_speed(Node):
         circumference = math.pi * diameter  # mm
 
         self.rack_distance += mm_to_cm((msg.linear.z / tick_per_revolution) * circumference)
+
+
+    def cmd_encoder_reset(self, msg):
+
+        # Zero any locally accumulated values/offsets
+        self.rack_distance = 0.0
+        self.left_ticks_offset = 0
+        self.right_ticks_offset = 0
+
+        # If you keep any PID integrators or filters, clear them here too
+        # e.g., self.controller.reset()  (if you use one)
+
+        self.get_logger().info("Encoder/local odometry reset")
     
 
     def cmd_spin(self, msg):
@@ -179,10 +202,13 @@ class Cmd_vel_to_motor_speed(Node):
 
         motordrill_msg = Twist()
         motordrill_msg.linear.z = float(self.motordrillSpeed)
+
+        servo_msg.linear.x = float(self.servo_angle)
         
         self.send_robot_speed.publish(motorspeed_msg)
         self.send_spin_speed.publish(motorspin_msg)
         self.send_drill_speed.publish(motordrill_msg)
+        self.send_gripper_angle.publish(servo_msg)
 
 
 def main():
