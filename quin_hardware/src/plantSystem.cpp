@@ -31,11 +31,17 @@ geometry_msgs__msg__Twist debug_spin_msg;
 rcl_publisher_t debug_drill_publisher;
 geometry_msgs__msg__Twist debug_drill_msg;
 
+rcl_publisher_t debug_gripper_publisher;
+geometry_msgs__msg__Twist debug_gripper_msg;
+
 rcl_subscription_t spin_subscriber;        // subscribe /cmd_spin
 geometry_msgs__msg__Twist spin_msg;
 
 rcl_subscription_t drill_subscriber;        // subscribe /cmd_drill
 geometry_msgs__msg__Twist drill_msg;
+
+rcl_subscription_t gripper_subscriber;        // subscribe /cmd_gripper
+geometry_msgs__msg__Twist gripper_msg;
 
 
 rclc_executor_t executor;
@@ -69,6 +75,7 @@ volatile long remaining_steps = 0;
 // -1 = last was LEFT, 0 = neutral, 1 = RIGHT
 int last_dir = 0;
 
+Servo myservo;
 
 // ------ function list ------
 
@@ -80,17 +87,21 @@ void publishData();
 struct timespec getTime();
 void Spin();
 void Drill();
+void Gripper();
 
 // ------ main ------
 
 void setup()
 {
+    myServo.attach(9);   // attach servo signal pin to D9
+
     // put your setup code here, to run once:
     Serial.begin(115200);
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
 
     spinStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
     drillStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
+    myServo.write(SERVO_CLOSED);        // Start in closed position
 }
 
 void loop() {
@@ -126,6 +137,7 @@ void controlCallback(rcl_timer_t *timer, int64_t last_call_time)
     {
         Spin();
         Drill();
+        Gripper();
         publishData();
     }
 }
@@ -141,7 +153,14 @@ void twist2Callback(const void *msgin)
 {   
     const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
     prev_cmd_time = millis();
-    spin_msg.angular.z = msg->angular.z; // rotate
+    spin_msg.linear.z = msg->linear.z; // up - down
+}
+
+void twist3Callback(const void *msgin)
+{   
+    const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
+    prev_cmd_time = millis();
+    spin_msg.linear.x = msg->linear.x; // rotate
 }
 
 bool createEntities()       // create ROS entities 
@@ -149,6 +168,7 @@ bool createEntities()       // create ROS entities
     allocator = rcl_get_default_allocator();    // manage memory of micro-Ros
     geometry_msgs__msg__Twist__init(&debug_spin_msg);
     geometry_msgs__msg__Twist__init(&debug_drill_msg);
+    geometry_msgs__msg__Twist__init(&debug_gripper_msg);
 
     init_options = rcl_get_zero_initialized_init_options();
     rcl_init_options_init(&init_options, allocator);
@@ -168,6 +188,11 @@ bool createEntities()       // create ROS entities
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
         "/quin/debug/drill"));
 
+    RCCHECK(rclc_publisher_init_best_effort(
+        &debug_gripper_publisher, &node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+        "/quin/debug/gripper"));
+
     RCCHECK(rclc_subscription_init_best_effort(
         &spin_subscriber, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
@@ -177,6 +202,11 @@ bool createEntities()       // create ROS entities
         &drill_subscriber, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
         "/quin/cmd_drill"));
+
+    RCCHECK(rclc_subscription_init_best_effort(
+        &gripper_subscriber, &node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+        "/quin/cmd_gripper"));
 
     const unsigned int control_timeout = 20;
     RCCHECK(rclc_timer_init_default(
@@ -191,6 +221,9 @@ bool createEntities()       // create ROS entities
 
     RCCHECK(rclc_executor_add_subscription(
         &executor, &drill_subscriber, &drill_msg, &twist2Callback, ON_NEW_DATA));
+
+    RCCHECK(rclc_executor_add_subscription(
+        &executor, &gripper_subscriber, &gripper_msg, &twist3Callback, ON_NEW_DATA));
 
     RCCHECK(rclc_executor_add_timer(&executor, &control_timer));
     syncTime();
@@ -207,6 +240,8 @@ bool destroyEntities()      // destroy ROS entities
     rcl_subscription_fini(&spin_subscriber, &node);
     rcl_publisher_fini(&debug_drill_publisher, &node);
     rcl_subscription_fini(&drill_subscriber, &node);
+    rcl_publisher_fini(&debug_gripper_publisher, &node);
+    rcl_subscription_fini(&gripper_subscriber, &node);
     rcl_node_fini(&node);
     rcl_timer_fini(&control_timer);
     rclc_executor_fini(&executor);
@@ -286,6 +321,19 @@ void Drill()
     debug_drill_msg.linear.z = drill_msg.linear.z;
 }
 
+void Gripper()
+{
+    if (gripper_msg.linear.x == 2) {
+        myservo.write(SERVO_OPENED);
+        gripper_msg.linear.x = 2.0;  // indicate opened
+    } else if (gripper_msg.linear.x == 1) {
+        myservo.write(SERVO_CLOSED);
+        gripper_msg.linear.x = 1.0;  // indicate closed
+    }
+
+    debug_gripper_msg.linear.x = gripper_msg.linear.x;
+}
+
 void publishData()
 {
     debug_spin_msg.angular.z = spin_msg.angular.z;
@@ -293,6 +341,9 @@ void publishData()
 
     debug_drill_msg.linear.z = drill_msg.linear.z;
     rcl_publish(&debug_drill_publisher, &debug_drill_msg, NULL);
+
+    debug_gripper_msg.linear.x = gripper_msg.linear.x;
+    rcl_publish(&debug_gripper_publisher, &debug_gripper_msg, NULL);
 }
 
 void syncTime()
