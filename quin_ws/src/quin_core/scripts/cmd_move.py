@@ -12,6 +12,11 @@ from quin_core.utilize import *
 from quin_core.controller import *
 import time 
 
+from std_msgs.msg import Int32   # plant counter publisher
+
+def mm_to_cm(x_mm: float) -> float:
+    return x_mm / 10.0
+
 class Cmd_vel_to_motor_speed(Node):
 
     def __init__(self):
@@ -48,7 +53,16 @@ class Cmd_vel_to_motor_speed(Node):
 
         self.BTN_CIRCLE = 1
         self.BTN_SQUARE = 3
-        self.BTN_R1 = 4
+        self.BTN_L1 = 4
+        self.BTN_R1 = 5
+
+
+        # -------- plant counting via press-toggle --------
+        self.move_down_next = True       # first press is DOWN, second (UP) completes a plant
+        # self._prev_drill_pressed = False
+        # self._last_press_ts = 0.0
+        # self._press_debounce_s = 0.25     # ignore repeat within 250 ms
+        self.plant_count = 0
 
 
         # self.previous_manual_turn = time.time()
@@ -73,6 +87,10 @@ class Cmd_vel_to_motor_speed(Node):
             Twist, "/quin/cmd_gripper/angle", qos_profile=qos.qos_profile_system_default
         )
 
+        self.send_plant_count = self.create_publisher(
+            Twist, "/quin/plant_count", qos_profile=qos.qos_profile_system_default
+        )
+
 
 
         self.create_subscription(
@@ -88,6 +106,10 @@ class Cmd_vel_to_motor_speed(Node):
         )
 
         self.create_subscription(
+            Twist, "/quin/drill/feedback", self.drill_feedback, qos.qos_profile_sensor_data
+        )
+
+        self.create_subscription(
             Twist, '/quin/cmd_gripper', self.cmd_gripper, qos_profile=qos.qos_profile_system_default
         )
 
@@ -98,6 +120,7 @@ class Cmd_vel_to_motor_speed(Node):
         self.create_subscription(
             Twist, "/quin/cmd_encoder_reset", self.encoder_reset, qos_profile=qos.qos_profile_system_default
         )
+
 
         self.sent_data_timer = self.create_timer(0.01, self.sendData)
         
@@ -180,6 +203,16 @@ class Cmd_vel_to_motor_speed(Node):
             self.motordrillSpeed = 1.0
             threading.Timer(0.05, lambda: setattr(self, "motordrillSpeed", 0.0)).start()
 
+            # --- ADDED: count 1 plant on the 'UP' press (every second press) ---
+            # move_down_next True  => this press commands DOWN (start of cycle)
+            # move_down_next False => this press commands UP   (end of cycle) -> count +1
+            if not self.move_down_next:
+                self.plant_count += 1
+                self.send_plant_count.publish(Int32(data=self.plant_count))
+
+            # flip expected direction for next press
+            self.move_down_next = not self.move_down_next
+
         self._prev_drill_pressed = l1
         
 
@@ -203,6 +236,7 @@ class Cmd_vel_to_motor_speed(Node):
         motordrill_msg = Twist()
         motordrill_msg.linear.z = float(self.motordrillSpeed)
 
+        servo_msg = Twist()
         servo_msg.linear.x = float(self.servo_angle)
         
         self.send_robot_speed.publish(motorspeed_msg)
