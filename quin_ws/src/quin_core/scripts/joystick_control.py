@@ -155,6 +155,7 @@ class Joystick(Node):
             Twist, "/quin/cmd_encode/reset", qos_profile=qos.qos_profile_system_default
         )
 
+
         self.create_subscription(
             Joy, '/quin/joy', self.joy, qos_profile=qos.qos_profile_sensor_data # 10
         )
@@ -249,8 +250,8 @@ class Joystick(Node):
         
 
         if self.gamepad.encoder_reset:
-+            self.pub_encoder_reset.publish(Empty())
-+            self.gamepad.encoder_reset = False
+            self.pub_encoder_reset.publish(Empty())
+            self.gamepad.encoder_reset = False
 
 
         if self.gamepad.toggle_encoder_bool:
