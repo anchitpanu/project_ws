@@ -24,11 +24,7 @@ export default function Page() {
   const [mjpegUrl, setMjpegUrl] = useState("http://192.168.1.50:8080/stream?topic=/quin/image_raw");
 
   // ---- Topic names (adjust to your actual topics) ----
-<<<<<<< Updated upstream
-  const [distanceTopic, setDistanceTopic] = useState("/quin/debug/encoder");      // std_msgs/Float32
-=======
   const [distanceTopic, setDistanceTopic] = useState("/quin/debug/encoder"); // std_msgs/Float32
->>>>>>> Stashed changes
   const [plantCountTopic, setPlantCountTopic] = useState("/quin/plant_count");    // std_msgs/UInt32
 
   // ---- ROS connection ----

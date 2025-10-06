@@ -5,12 +5,14 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String, Int16MultiArray
 from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float32MultiArray, Empty
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy
 from rclpy import qos
 from quin_core.utilize import *
 from quin_core.controller import *
 import time 
+import math
 
 from std_msgs.msg import Int32   # plant counter publisher
 
@@ -46,8 +48,8 @@ class Cmd_vel_to_motor_speed(Node):
         # encoder/range state you may want to zero on reset
         self.encoder_mode = 1.0          # 1=Bit, 2=RPM (default)
         self.rack_distance = 0.0         # example accumulated distance (cm)
-        self.left_ticks_offset = 0       # if you track offsets, zero them here
-        self.right_ticks_offset = 0
+        self._tick_zero = 0.0
+        self._have_baseline = False
 
         self.servo_angle : float = 0.0
 
@@ -88,7 +90,7 @@ class Cmd_vel_to_motor_speed(Node):
         )
 
         self.send_plant_count = self.create_publisher(
-            Twist, "/quin/plant_count", qos_profile=qos.qos_profile_system_default
+            Int32, "/quin/plant_count", qos_profile=qos.qos_profile_system_default
         )
 
 
@@ -118,7 +120,7 @@ class Cmd_vel_to_motor_speed(Node):
         )
 
         self.create_subscription(
-            Twist, "/quin/cmd_encoder_reset", self.encoder_reset, qos_profile=qos.qos_profile_system_default
+            Empty, "/quin/cmd_encoder/reset", self.cmd_encoder_reset, qos_profile=qos.qos_profile_system_default
         )
 
 
@@ -159,6 +161,14 @@ class Cmd_vel_to_motor_speed(Node):
         diameter = 85  # mm
         circumference = math.pi * diameter  # mm
 
+        current_ticks = float(msg.linear.z)
+
+        if not self._have_baseline:
+            self._tick_zero = current_ticks
+            self._have_baseline = True
+            self.rack_distance = 0.0
+            return      
+
         self.rack_distance += mm_to_cm((msg.linear.z / tick_per_revolution) * circumference)
 
 
@@ -166,8 +176,7 @@ class Cmd_vel_to_motor_speed(Node):
 
         # Zero any locally accumulated values/offsets
         self.rack_distance = 0.0
-        self.left_ticks_offset = 0
-        self.right_ticks_offset = 0
+        self._have_baseline = False
 
         # If you keep any PID integrators or filters, clear them here too
         # e.g., self.controller.reset()  (if you use one)

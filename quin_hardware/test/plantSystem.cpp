@@ -11,7 +11,9 @@
 
 #include <geometry_msgs/msg/twist.h>
 #include <ESP32Encoder.h>
-#include <Stepper.h>
+#include <ESP32Servo.h>
+#include <Stepper.h> 
+
 
 #include "../config/spin.h" 
 #include "../config/digging.h" 
@@ -64,10 +66,6 @@ enum states
     AGENT_DISCONNECTED   // 3
 } state;
 
-
-Stepper spinStepper(STEPS_PER_REV, SPIN_STEP_PIN_PLS, SPIN_STEP_PIN_DIR);
-Stepper drillStepper(STEPS_PER_CM, DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR);
-
 // Movement queue: remaining steps to execute (positive or negative)
 volatile long remaining_steps = 0;
 
@@ -75,7 +73,10 @@ volatile long remaining_steps = 0;
 // -1 = last was LEFT, 0 = neutral, 1 = RIGHT
 int last_dir = 0;
 
-Servo myservo;
+Stepper spinStepper(STEPS_PER_REV, SPIN_STEP_PIN_PLS, SPIN_STEP_PIN_DIR);
+Stepper drillStepper(STEPS_PER_CM, DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR);
+
+Servo myServo;
 
 // ------ function list ------
 
@@ -91,17 +92,20 @@ void Gripper();
 
 // ------ main ------
 
-void setup()
-{
-    myServo.attach(9);   // attach servo signal pin to D9
+void setup() {
+  Serial.begin(115200);
+  set_microros_serial_transports(Serial);
 
-    // put your setup code here, to run once:
-    Serial.begin(115200);
-    set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
+  pinMode(SPIN_STEP_PIN_PLS, OUTPUT);
+  pinMode(SPIN_STEP_PIN_DIR, OUTPUT);
+  pinMode(DRILL_STEP_PIN_PLS, OUTPUT);
+  pinMode(DRILL_STEP_PIN_DIR, OUTPUT);
 
-    spinStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
-    drillStepper.setSpeed(STEPPER_RPM);  // set speed to 10 RPM
-    myServo.write(SERVO_CLOSED);        // Start in closed position
+  spinStepper.setSpeed(STEPPER_RPM);
+  drillStepper.setSpeed(STEPPER_RPM);
+
+  myServo.attach(19);
+  myServo.write(SERVO_CLOSED);
 }
 
 void loop() {
@@ -153,14 +157,14 @@ void twist2Callback(const void *msgin)
 {   
     const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
     prev_cmd_time = millis();
-    spin_msg.linear.z = msg->linear.z; // up - down
+    drill_msg.linear.z = msg->linear.z; // up - down
 }
 
 void twist3Callback(const void *msgin)
 {   
     const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
     prev_cmd_time = millis();
-    spin_msg.linear.x = msg->linear.x; // rotate
+    gripper_msg.linear.x = msg->linear.x; // rotate
 }
 
 bool createEntities()       // create ROS entities 
@@ -214,7 +218,7 @@ bool createEntities()       // create ROS entities
         RCL_MS_TO_NS(control_timeout), controlCallback));
 
     executor = rclc_executor_get_zero_initialized_executor();
-    RCCHECK(rclc_executor_init(&executor, &support.context, 3, &allocator));    // max handles = 3
+    RCCHECK(rclc_executor_init(&executor, &support.context, 5, &allocator));    // max handles = 3
 
     RCCHECK(rclc_executor_add_subscription(
         &executor, &spin_subscriber, &spin_msg, &twistCallback, ON_NEW_DATA));
@@ -283,6 +287,7 @@ void Spin()
     debug_spin_msg.angular.z = spin_msg.angular.z;
 }
 
+
 void Drill()
 {
     // --- make variables static so they remember their values between calls ---
@@ -321,13 +326,14 @@ void Drill()
     debug_drill_msg.linear.z = drill_msg.linear.z;
 }
 
+
 void Gripper()
 {
     if (gripper_msg.linear.x == 2) {
-        myservo.write(SERVO_OPENED);
+        myServo.write(SERVO_OPENED);
         gripper_msg.linear.x = 2.0;  // indicate opened
     } else if (gripper_msg.linear.x == 1) {
-        myservo.write(SERVO_CLOSED);
+        myServo.write(SERVO_CLOSED);
         gripper_msg.linear.x = 1.0;  // indicate closed
     }
 

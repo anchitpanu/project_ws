@@ -152,7 +152,7 @@ class Joystick(Node):
         )
 
         self.pub_encoder_reset = self.create_publisher(
-            Twist, "/quin/cmd_encode/reset", qos_profile=qos.qos_profile_system_default
+            Twist, "/quin/cmd_encoder/reset", qos_profile=qos.qos_profile_system_default
         )
 
 
