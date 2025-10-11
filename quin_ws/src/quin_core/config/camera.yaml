@@ -1,0 +1,11 @@
+v4l2_camera:
+  ros__parameters:
+    video_device: "/dev/camera_driver"   # ใช้ชื่อถาวร
+    image_size: [1280, 720]         # เปลี่ยนได้: [1920,1080] ฯลฯ
+    pixel_format: "YUYV"             # "MJPG" ลดภาระ CPU, ถ้ากล้องไม่มีให้ใช้ "YUYV"
+    time_per_frame: [1, 30]          # = 30 fps (1/30)
+    output_encoding: "rgb8"          # หรือ "yuv422_yuy2" ถ้าต้องการตรงรูปแบบ
+    use_sensor_data_qos: true         # QoS สำหรับกล้อง
+    camera_frame_id: "camera_frame"
+    # ถ้ามีไฟล์ calibration:
+    # camera_info_url: "file:///home/quin/project_ws/quin_ws/src/quin_core/config/camera_info.yaml"

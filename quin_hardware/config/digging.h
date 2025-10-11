@@ -2,8 +2,8 @@
 #define DIGGING_H
 
 // ---------------- Pins ----------------
-#define DRILL_STEP_PIN_DIR  14
-#define DRILL_STEP_PIN_PLS  12
+#define DRILL_STEP_PIN_DIR  27
+#define DRILL_STEP_PIN_PLS  26
 
 // ---------------- Mechanics ----------------
 // Motor & driver
@@ -35,7 +35,9 @@
 #define JOY_PRESS_THRESH       0.5f
 
 // ---------------- Servo positions ----------------
+
+#define SERVO_PIN  13
 static const int SERVO_CLOSED = 0;     // fully closed position
-static const int SERVO_OPENED = 60;    // opened position (tune as needed)
+static const int SERVO_OPENED = 50;    // opened position (tune as needed)
 
 #endif

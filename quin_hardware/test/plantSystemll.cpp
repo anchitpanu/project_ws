@@ -14,19 +14,15 @@
 #include <ESP32Servo.h>
 #include <Stepper.h> 
 
-
 #include "../config/spin.h" 
 #include "../config/digging.h" 
-
 
 // -------- Helpers --------
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if ((temp_rc != RCL_RET_OK)) { rclErrorLoop(); }}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; (void)temp_rc; }
 #define EXECUTE_EVERY_N_MS(MS, X) do { static volatile int64_t init = -1; if (init == -1) { init = uxr_millis(); } if (uxr_millis() - init > MS) { X; init = uxr_millis(); } } while (0)
 
-
 // -------- ROS entities --------
-
 rcl_publisher_t debug_spin_publisher;
 geometry_msgs__msg__Twist debug_spin_msg;
 
@@ -39,12 +35,11 @@ geometry_msgs__msg__Twist debug_gripper_msg;
 rcl_subscription_t spin_subscriber;        // subscribe /cmd_spin
 geometry_msgs__msg__Twist spin_msg;
 
-rcl_subscription_t drill_subscriber;        // subscribe /cmd_drill
+rcl_subscription_t drill_subscriber;       // subscribe /cmd_drill
 geometry_msgs__msg__Twist drill_msg;
 
-rcl_subscription_t gripper_subscriber;        // subscribe /cmd_gripper
+rcl_subscription_t gripper_subscriber;     // subscribe /cmd_gripper
 geometry_msgs__msg__Twist gripper_msg;
-
 
 rclc_executor_t executor;
 rclc_support_t support;
@@ -52,7 +47,7 @@ rcl_allocator_t allocator;
 rcl_node_t node;
 rcl_timer_t control_timer;
 rcl_init_options_t init_options;
-    
+
 unsigned long long time_offset = 0;
 unsigned long prev_cmd_time = 0;
 unsigned long prev_odom_update = 0;
@@ -73,13 +68,55 @@ volatile long remaining_steps = 0;
 // -1 = last was LEFT, 0 = neutral, 1 = RIGHT
 int last_dir = 0;
 
+// Keep original Stepper objects (not used for pulse timing now, but preserved to avoid structural changes)
 Stepper spinStepper(STEPS_PER_REV, SPIN_STEP_PIN_PLS, SPIN_STEP_PIN_DIR);
 Stepper drillStepper(STEPS_PER_CM, DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR);
 
 Servo myServo;
 
-// ------ function list ------
+// ------ Non-blocking stepper helpers (ADDED) ------
+// These helpers implement a non-blocking STEP/DIR pulse generator.
+// They are serviced at high frequency from control timer without blocking ROS executor.
+struct StepperCtl {
+  uint8_t pin_step;
+  uint8_t pin_dir;
+  volatile long steps_remaining;   // remaining steps to emit (counts down to 0)
+  unsigned long next_us;           // timestamp for the next edge (micros)
+  bool pulse_high;                 // current edge state (HIGH interval in progress)
+};
 
+StepperCtl spinCtl  = {SPIN_STEP_PIN_PLS,  SPIN_STEP_PIN_DIR, 0, 0, false};
+StepperCtl drillCtl = {DRILL_STEP_PIN_PLS, DRILL_STEP_PIN_DIR, 0, 0, false};
+
+// Emit one edge if it's time; call this from control timer frequently.
+inline void service_stepper(StepperCtl &ctl) {
+  if (ctl.steps_remaining == 0) return;
+  unsigned long now = micros();
+  if (now < ctl.next_us) return;
+
+  if (!ctl.pulse_high) {
+    // Start HIGH interval of the step pulse
+    digitalWrite(ctl.pin_step, HIGH);
+    ctl.pulse_high = true;
+    ctl.next_us = now + STEP_PULSE_HIGH_US;                 // HIGH width
+  } else {
+    // End HIGH interval -> go LOW and count one step
+    digitalWrite(ctl.pin_step, LOW);
+    ctl.pulse_high = false;
+    ctl.next_us = now + (STEP_PERIOD_US - STEP_PULSE_HIGH_US);  // remaining LOW time
+    ctl.steps_remaining--;                                     // one full step completed
+  }
+}
+
+// Queue steps (non-blocking). Direction is set immediately, pulse starts ASAP.
+inline void queue_steps(StepperCtl &ctl, bool dir_high, long steps) {
+  digitalWrite(ctl.pin_dir, dir_high ? HIGH : LOW);
+  ctl.pulse_high = false;           // ensure we begin from a LOW edge
+  ctl.steps_remaining += steps;     // allow stacking multiple commands
+  ctl.next_us = micros();           // ready to emit immediately
+}
+
+// ------ function list ------
 void rclErrorLoop();
 void syncTime();
 bool createEntities();
@@ -88,14 +125,19 @@ void publishData();
 struct timespec getTime();
 void Spin();
 void Drill();
-// void Gripper();
+void Gripper();
 
 // ------ main ------
-
 void setup() {
   Serial.begin(115200);
   set_microros_serial_transports(Serial);
 
+  pinMode(SPIN_STEP_PIN_PLS, OUTPUT);
+  pinMode(SPIN_STEP_PIN_DIR, OUTPUT);
+  pinMode(DRILL_STEP_PIN_PLS, OUTPUT);
+  pinMode(DRILL_STEP_PIN_DIR, OUTPUT);
+
+  // Keep original API calls to avoid structural changes
   spinStepper.setSpeed(STEPPER_RPM);
   drillStepper.setSpeed(STEPPER_RPM);
 
@@ -128,15 +170,20 @@ void loop() {
 }
 
 // ------ functions ------
-
 void controlCallback(rcl_timer_t *timer, int64_t last_call_time)
 {
     RCLC_UNUSED(last_call_time);
     if (timer != NULL)
     {
+        // Non-blocking pulse service for both steppers (IMPORTANT: this must be called very frequently)
+        service_stepper(spinCtl);
+        service_stepper(drillCtl);
+
+        // High-level logic (enqueues steps only, no busy-wait loops)
         Spin();
         Drill();
-        // Gripper();
+        Gripper();
+
         publishData();
     }
 }
@@ -164,7 +211,7 @@ void twist3Callback(const void *msgin)
 
 bool createEntities()       // create ROS entities 
 {
-    allocator = rcl_get_default_allocator();    // manage memory of micro-Ros
+    allocator = rcl_get_default_allocator();    // manage memory of micro-ROS
     geometry_msgs__msg__Twist__init(&debug_spin_msg);
     geometry_msgs__msg__Twist__init(&debug_drill_msg);
     geometry_msgs__msg__Twist__init(&debug_gripper_msg);
@@ -207,13 +254,14 @@ bool createEntities()       // create ROS entities
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
         "/quin/cmd_gripper"));
 
-    const unsigned int control_timeout = 20;
+    // Shorter control period so the pulse service runs at ~1kHz (non-blocking stepping)
+    const unsigned int control_timeout = 1;   // ms
     RCCHECK(rclc_timer_init_default(
         &control_timer, &support,
         RCL_MS_TO_NS(control_timeout), controlCallback));
 
     executor = rclc_executor_get_zero_initialized_executor();
-    RCCHECK(rclc_executor_init(&executor, &support.context, 5, &allocator));    // max handles = 3
+    RCCHECK(rclc_executor_init(&executor, &support.context, 5, &allocator));    // max handles = 5
 
     RCCHECK(rclc_executor_add_subscription(
         &executor, &spin_subscriber, &spin_msg, &twistCallback, ON_NEW_DATA));
@@ -232,9 +280,7 @@ bool createEntities()       // create ROS entities
 
 bool destroyEntities()      // destroy ROS entities
 {
-    // rmw_context_t *rmw_context = rcl_context_get_rmw_context(&support.context);
-    // (void)rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
-
+    // Keep original destruction order; ensures clean teardown on disconnect
     rcl_publisher_fini(&debug_spin_publisher, &node);
     rcl_subscription_fini(&spin_subscriber, &node);
     rcl_publisher_fini(&debug_drill_publisher, &node);
@@ -251,105 +297,85 @@ bool destroyEntities()      // destroy ROS entities
 
 void Spin()
 {
+    // Edge-based triggering: enqueue exactly 36-degree worth of steps per direction change press
     const float z = spin_msg.angular.z;
 
     if (z > TWIST_THRESH && last_dir != 1) {
-      digitalWrite(SPIN_STEP_PIN_DIR, HIGH);          // press = clockwise 36 degree
-      for (int i = 0; i < STEPS_PER_36; i++) {
-        digitalWrite(SPIN_STEP_PIN_PLS, HIGH);
-        delayMicroseconds(STEP_PULSE_HIGH_US);               // adjust speed here (lower = faster)
-        digitalWrite(SPIN_STEP_PIN_PLS, LOW);
-        delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
-      }
-      last_dir = 1;                         // prevent re-trigger until direction changes
+      // Clockwise (adjust DIR polarity to match your driver if needed)
+      queue_steps(spinCtl, /*dir_high=*/true, STEPS_PER_36);
+      last_dir = 1;  // block re-trigger until direction changes or neutral
     } 
-    
     else if (z < -TWIST_THRESH && last_dir != -1) {
-      digitalWrite(SPIN_STEP_PIN_DIR, LOW);           // press = counter-clockwise 36 degree
-      for (int i = 0; i < STEPS_PER_36; i++) {
-        digitalWrite(SPIN_STEP_PIN_PLS, HIGH);
-        delayMicroseconds(STEP_PULSE_HIGH_US);
-        digitalWrite(SPIN_STEP_PIN_PLS, LOW);
-        delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
-      }
+      // Counter-clockwise
+      queue_steps(spinCtl, /*dir_high=*/false, STEPS_PER_36);
       last_dir = -1;
-    }
-    
+    } 
     else if (fabs(z) < TWIST_DEADZONE) {
-      last_dir = 0;  // reset edge detection
+      // Neutral: allow next edge
+      last_dir = 0;
     }
 
     debug_spin_msg.angular.z = spin_msg.angular.z;
 }
 
-
 void Drill()
 {
-    // --- make variables static so they remember their values between calls ---
-    static int move_state = 0;        // 0 = idle, 1 = down, -1 = up
-    static bool prev_pressed = false; // previous button state
+    // Toggle down/up per press; movement distance is TRAVEL_CM each time.
+    static int  move_state   = 0;    // 0 = idle/ready, 1 = next is down, -1 = next is up
+    static bool prev_pressed = false;
 
-    // read joystick Z (e.g. button or axis)
     const float z = drill_msg.linear.z;
-    bool pressed_now = (fabs(z) > JOY_PRESS_THRESH);
+    bool pressed_now  = (fabs(z) > JOY_PRESS_THRESH);
+    bool rising_edge  = pressed_now && !prev_pressed;
 
-    // --- detect rising edge (button just pressed) ---
-    bool rising_edge = pressed_now && !prev_pressed;
-
-    if (rising_edge)
-    {
-        // toggle direction each press
-        if (move_state != 1) {
-            move_state = 1;   // move down
-            digitalWrite(DRILL_STEP_PIN_DIR, HIGH);
-        } else {
-            move_state = -1;  // move up
-            digitalWrite(DRILL_STEP_PIN_DIR, LOW);
-        }
-
+    if (rising_edge) {
         long total_steps = (long)(TRAVEL_CM * STEPS_PER_CM);
 
-        for (long i = 0; i < total_steps; i++) {
-            digitalWrite(DRILL_STEP_PIN_PLS, HIGH);
-            delayMicroseconds(STEP_PULSE_HIGH_US);
-            digitalWrite(DRILL_STEP_PIN_PLS, LOW);
-            delayMicroseconds(STEP_PERIOD_US - STEP_PULSE_HIGH_US);
+        if (move_state != 1) {
+            // Queue "down" travel
+            queue_steps(drillCtl, /*dir_high=*/true, total_steps);
+            move_state = 1;
+        } else {
+            // Queue "up" travel
+            queue_steps(drillCtl, /*dir_high=*/false, total_steps);
+            move_state = -1;
         }
     }
 
-    prev_pressed = pressed_now;   // update for edge detection
+    prev_pressed = pressed_now;
     debug_drill_msg.linear.z = drill_msg.linear.z;
 }
 
+void Gripper()
+{
+    // Simple immediate servo actuation (already non-blocking)
+    if (gripper_msg.linear.x == 1) {
+        myServo.write(SERVO_OPENED);
+        gripper_msg.linear.x = 1.0;  // indicate opened
+    } else if (gripper_msg.linear.x == 0) {
+        myServo.write(SERVO_CLOSED);
+        gripper_msg.linear.x = 0.0;  // indicate closed
+    }
 
-// void Gripper()
-// {
-//     if (gripper_msg.linear.x == 2) {
-//         myServo.write(SERVO_OPENED);
-//         gripper_msg.linear.x = 2.0;  // indicate opened
-//     } else if (gripper_msg.linear.x == 1) {
-//         myServo.write(SERVO_CLOSED);
-//         gripper_msg.linear.x = 1.0;  // indicate closed
-//     }
-
-//     debug_gripper_msg.linear.x = gripper_msg.linear.x;
-// }
+    debug_gripper_msg.linear.x = gripper_msg.linear.x;
+}
 
 void publishData()
 {
+    // Best-effort debug publishers; keep as-is
     debug_spin_msg.angular.z = spin_msg.angular.z;
     rcl_publish(&debug_spin_publisher, &debug_spin_msg, NULL);
 
     debug_drill_msg.linear.z = drill_msg.linear.z;
     rcl_publish(&debug_drill_publisher, &debug_drill_msg, NULL);
 
-    // debug_gripper_msg.linear.x = gripper_msg.linear.x;
-    // rcl_publish(&debug_gripper_publisher, &debug_gripper_msg, NULL);
+    debug_gripper_msg.linear.x = gripper_msg.linear.x;
+    rcl_publish(&debug_gripper_publisher, &debug_gripper_msg, NULL);
 }
 
 void syncTime()
 {
-    // wait for time to be non-zero
+    // Wait until time is non-zero, then compute offset to Arduino millis()
     struct timespec ts;
     ts.tv_sec = 0;
     ts.tv_nsec = 0;
@@ -359,7 +385,7 @@ void syncTime()
         delay(10);
     } while (ts.tv_sec == 0 && ts.tv_nsec == 0);
 
-    unsigned long long now_millis = (unsigned long long)ts.tv_sec * 1000 + (unsigned long long)(ts.tv_nsec / 1000000);
+    unsigned long long now_millis = (unsigned long long)ts.tv_sec * 1000ULL + (unsigned long long)(ts.tv_nsec / 1000000ULL);
     time_offset = now_millis - millis();
 
     Serial.print("Synchronized time: ");
@@ -373,16 +399,12 @@ struct timespec getTime()
 {
     struct timespec tp = {0};
     unsigned long long now = millis() + time_offset;
-    tp.tv_sec = now / 1000;
-    tp.tv_nsec = (now % 1000) * 1000000;
-
+    tp.tv_sec = now / 1000ULL;
+    tp.tv_nsec = (now % 1000ULL) * 1000000UL;
     return tp;
 }
-void rclErrorLoop() {
 
+void rclErrorLoop() {
+    // Keep the original behavior on fatal RCL errors
     ESP.restart();
 }
-
-
-
-

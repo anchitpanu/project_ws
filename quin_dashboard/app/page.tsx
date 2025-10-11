@@ -2,30 +2,19 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import ROSLIB from "roslib";
-import { Camera, Gauge, Sprout, PlugZap, Satellite, Signal } from "lucide-react";
-
-/**
- * Minimal Robot Monitor:
- * - Camera (MJPEG via web_video_server)
- * - Distance from encoder (std_msgs/Float32)  -> meters
- * - Plant count (std_msgs/UInt32)             -> number of planted seedlings
- *
- * Place in: app/page.tsx
- * Robot side must run:
- *   ros2 launch rosbridge_server rosbridge_websocket_launch.xml   # ws://<robot-ip>:9090
- *   ros2 run web_video_server web_video_server                     # http://<robot-ip>:8080
- */
+import { Camera, Gauge, PlugZap, Satellite, Signal } from "lucide-react";
 
 type RosLike = ROSLIB.Ros | null;
 
 export default function Page() {
-  // ---- Configurable endpoints (edit defaults; can change in UI) ----
-  const [wsUrl, setWsUrl] = useState("ws://192.168.1.50:9090");
-  const [mjpegUrl, setMjpegUrl] = useState("http://192.168.1.50:8080/stream?topic=/quin/image_raw");
+  // ---- Endpoints ----
+  const [wsUrl, setWsUrl] = useState("ws://192.168.1.100:9090");
+  const [mjpegUrl, setMjpegUrl] = useState(
+    "http://192.168.1.100:8081/stream?topic=/quin/image_raw"
+  );
 
-  // ---- Topic names (adjust to your actual topics) ----
-  const [distanceTopic, setDistanceTopic] = useState("/quin/debug/encoder"); // std_msgs/Float32
-  const [plantCountTopic, setPlantCountTopic] = useState("/quin/plant_count");    // std_msgs/UInt32
+  // ---- Fixed topic: read directly from /quin/debug/encoder (Float32 in cm) ----
+  const distanceTopic = "/quin/debug/encoder";
 
   // ---- ROS connection ----
   const rosRef = useRef<RosLike>(null);
@@ -34,12 +23,16 @@ export default function Page() {
 
   useEffect(() => {
     return () => {
-      try { rosRef.current?.close(); } catch {}
+      try {
+        rosRef.current?.close();
+      } catch {}
     };
   }, []);
 
   const connect = () => {
-    try { rosRef.current?.close(); } catch {}
+    try {
+      rosRef.current?.close();
+    } catch {}
     const ros = new ROSLIB.Ros({ url: wsUrl });
     rosRef.current = ros;
     ros.on("connection", () => setIsConnected(true));
@@ -52,61 +45,51 @@ export default function Page() {
 
   const disconnect = () => {
     setAutoReconnect(false);
-    try { rosRef.current?.close(); } catch {}
+    try {
+      rosRef.current?.close();
+    } catch {}
   };
 
-  // ---- Distance subscriber (std_msgs/Float32) ----
-  const [distance, setDistance] = useState<number | null>(null);
+  // ---- Distance subscriber (std_msgs/msg/Float32 in cm -> show as meters) ----
+  const [distanceM, setDistanceM] = useState<number | null>(null);
   const [distanceUpdatedAt, setDistanceUpdatedAt] = useState<number | null>(null);
   const distanceSubRef = useRef<ROSLIB.Topic | null>(null);
 
   useEffect(() => {
     if (!isConnected || !rosRef.current) return;
+
     distanceSubRef.current?.unsubscribe();
+
     const sub = new ROSLIB.Topic({
       ros: rosRef.current,
       name: distanceTopic,
-      messageType: "std_msgs/Float32",
+      messageType: "std_msgs/msg/Float32", // ROS 2 type (สำคัญ)
+      throttle_rate: 100, // ms
+      queue_size: 1,
     });
+
+    console.log("[distance] subscribing to", distanceTopic);
+
     sub.subscribe((msg: any) => {
-      const v = typeof msg?.data === "number" ? msg.data : NaN;
-      setDistance(Number.isFinite(v) ? v : null);
+      const cm = Number(msg?.data);
+      const m = Number.isFinite(cm) ? cm / 100.0 : null; // cm -> m
+      setDistanceM(m);
       setDistanceUpdatedAt(Date.now());
     });
+
     distanceSubRef.current = sub;
-    return () => sub.unsubscribe();
-  }, [isConnected, distanceTopic]);
-
-  // ---- Plant count subscriber (std_msgs/UInt32 or Int32) ----
-  const [plantCount, setPlantCount] = useState<number | null>(null);
-  const [plantUpdatedAt, setPlantUpdatedAt] = useState<number | null>(null);
-  const plantSubRef = useRef<ROSLIB.Topic | null>(null);
-
-  useEffect(() => {
-    if (!isConnected || !rosRef.current) return;
-    plantSubRef.current?.unsubscribe();
-    // Try UInt32; if your message is Int32, change messageType below to "std_msgs/Int32"
-    const sub = new ROSLIB.Topic({
-      ros: rosRef.current,
-      name: plantCountTopic,
-      messageType: "std_msgs/UInt32",
-    });
-    sub.subscribe((msg: any) => {
-      const v = Number(msg?.data);
-      setPlantCount(Number.isFinite(v) ? v : null);
-      setPlantUpdatedAt(Date.now());
-    });
-    plantSubRef.current = sub;
-    return () => sub.unsubscribe();
-  }, [isConnected, plantCountTopic]);
+    return () => {
+      console.log("[distance] unsubscribe");
+      sub.unsubscribe();
+    };
+  }, [isConnected]);
 
   // ---- Helpers ----
-  const fmt = (n: number | null, d = 2) =>
-    n === null || Number.isNaN(n) ? "-" : n.toFixed(d);
+  const fmt = (n: number | null, d = 3) => (n == null ? "-" : n.toFixed(d));
 
   // ---- UI ----
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 md:p-8 text-slate-900">
       <div className="mx-auto max-w-5xl space-y-6">
         {/* Header */}
         <header className="flex items-center justify-between">
@@ -116,7 +99,7 @@ export default function Page() {
           </div>
           <div className="flex items-center gap-2">
             <Signal className={`h-5 w-5 ${isConnected ? "text-green-600" : "text-red-500"}`} />
-            <span className="text-sm text-slate-600">{isConnected ? "Connected" : "Disconnected"}</span>
+            <span className="text-sm">{isConnected ? "Connected" : "Disconnected"}</span>
           </div>
         </header>
 
@@ -157,22 +140,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
-            <LabeledInput
-              label="Distance topic (std_msgs/Float32)"
-              value={distanceTopic}
-              onChange={setDistanceTopic}
-              placeholder="/quin/encoder/distance_m"
-            />
-            <LabeledInput
-              label="Plant count topic (std_msgs/UInt32)"
-              value={plantCountTopic}
-              onChange={setPlantCountTopic}
-              placeholder="/quin/plant_count"
-            />
-          </div>
-
-          <label className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+          <label className="mt-3 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={autoReconnect}
@@ -180,9 +148,14 @@ export default function Page() {
             />
             Auto reconnect
           </label>
+
+          <p className="mt-2 text-xs">
+            Distance source: <code>{distanceTopic}</code> (<code>std_msgs/Float32</code> in <b>cm</b>,
+            UI shows <b>m</b>)
+          </p>
         </section>
 
-        {/* Grid: Camera + Two KPIs */}
+        {/* Grid: Camera + KPI */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Camera */}
           <section className="rounded-2xl border bg-white p-4 shadow-sm md:col-span-2">
@@ -193,7 +166,7 @@ export default function Page() {
             <div className="aspect-video w-full overflow-hidden rounded-xl border bg-black">
               <img src={mjpegUrl} alt="Robot camera" className="h-full w-full object-contain" />
             </div>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs">
               From <code>web_video_server</code> (HTTP :8080, MJPEG). Ensure topic name matches your camera topic.
             </p>
           </section>
@@ -202,20 +175,10 @@ export default function Page() {
           <KPI
             icon={<Gauge className="h-4 w-4" />}
             title="Distance (from encoder)"
-            value={fmt(distance, 3)}
+            value={fmt(distanceM, 3)}
             unit="m"
             updatedAt={distanceUpdatedAt}
-            note={`subscribe: ${distanceTopic} (std_msgs/Float32)`}
-          />
-
-          {/* Plant Count */}
-          <KPI
-            icon={<Sprout className="h-4 w-4" />}
-            title="Plants Planted"
-            value={plantCount === null ? "-" : plantCount}
-            unit=""
-            updatedAt={plantUpdatedAt}
-            note={`subscribe: ${plantCountTopic} (std_msgs/UInt32)`}
+            note={`subscribe: ${distanceTopic} (Float32 in cm → shown as m)`}
           />
         </div>
       </div>
@@ -226,23 +189,36 @@ export default function Page() {
 /* ---------- Small UI helpers ---------- */
 
 function LabeledInput({
-  label, value, onChange, placeholder,
-}: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs text-slate-600">{label}</label>
+      <label className="text-xs">{label}</label>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="rounded-xl border px-3 py-2 outline-none focus:ring"
+        className="rounded-xl border px-3 py-2 outline-none focus:ring placeholder-slate-700"
       />
     </div>
   );
 }
 
 function KPI({
-  icon, title, value, unit, updatedAt, note,
+  icon,
+  title,
+  value,
+  unit,
+  updatedAt,
+  note,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -259,13 +235,13 @@ function KPI({
       </div>
       <div className="flex items-end justify-between gap-4">
         <div className="text-5xl font-semibold tracking-tight">
-          {value} {unit ? <span className="text-sm font-normal text-slate-500">{unit}</span> : null}
+          {value} {unit ? <span className="text-sm font-normal">{unit}</span> : null}
         </div>
-        <div className="text-right text-xs text-slate-500">
+        <div className="text-right text-xs">
           <div>updated: {updatedAt ? new Date(updatedAt).toLocaleTimeString() : "-"}</div>
         </div>
       </div>
-      {note && <div className="mt-3 text-xs text-slate-500">{note}</div>}
+      {note && <div className="mt-3 text-xs">{note}</div>}
     </section>
   );
 }

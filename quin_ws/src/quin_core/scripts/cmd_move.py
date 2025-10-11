@@ -14,7 +14,8 @@ from quin_core.controller import *
 import time 
 import math
 
-from std_msgs.msg import Int32   # plant counter publisher
+# CHANGED: add Float32 for debug encoder topic (plant count removed)
+from std_msgs.msg import Float32   # for /quin/debug/encoder
 
 def mm_to_cm(x_mm: float) -> float:
     return x_mm / 10.0
@@ -45,11 +46,11 @@ class Cmd_vel_to_motor_speed(Node):
         self.motorspin1Speed: float = 0.0
         self.motordrillSpeed: float = 0.0
 
-        # encoder/range state you may want to zero on reset
+        # ------- encoder state (for local baseline/reset) -------
         self.encoder_mode = 1.0          # 1=Bit, 2=RPM (default)
-        self.rack_distance = 0.0         # example accumulated distance (cm)
-        self._tick_zero = 0.0
-        self._have_baseline = False
+        self.rack_distance = 0.0         # accumulated distance from local zero (cm)
+        self._tick_zero = 0.0            # baseline ticks
+        self._have_baseline = False      # first-sample guard
 
         self.servo_angle : float = 0.0
 
@@ -58,183 +59,158 @@ class Cmd_vel_to_motor_speed(Node):
         self.BTN_L1 = 4
         self.BTN_R1 = 5
 
-
-        # -------- plant counting via press-toggle --------
-        self.move_down_next = True       # first press is DOWN, second (UP) completes a plant
-        # self._prev_drill_pressed = False
-        # self._last_press_ts = 0.0
-        # self._press_debounce_s = 0.25     # ignore repeat within 250 ms
-        self.plant_count = 0
-
-
-        # self.previous_manual_turn = time.time()
-
-        # self.controller = Controller(kp = 1.0, ki = 0.05, kd = 0.001, baseSpeed = 0.3  ,errorTolerance = To_Radians(0.5), i_min= -1, i_max= 1)
-            
-        # self.macro_active = False
-
+        # ---------- Publishers (unchanged, except plant count removed) ----------
         self.send_robot_speed = self.create_publisher(
             Twist, "/quin/cmd_move/rpm", qos_profile=qos.qos_profile_system_default
         )
-
         self.send_spin_speed = self.create_publisher(
             Twist, "/quin/cmd_spin/rpm", qos_profile=qos.qos_profile_system_default
         )
-
         self.send_drill_speed = self.create_publisher(
             Twist, "/quin/cmd_drill/rpm", qos_profile=qos.qos_profile_system_default
         )
-
         self.send_gripper_angle = self.create_publisher(
             Twist, "/quin/cmd_gripper/angle", qos_profile=qos.qos_profile_system_default
         )
 
-        self.send_plant_count = self.create_publisher(
-            Int32, "/quin/plant_count", qos_profile=qos.qos_profile_system_default
+        # ADDED: single “check” topic for distance after reset
+        self.pub_debug_encoder = self.create_publisher(
+            Float32, "/quin/debug/encoder", qos_profile=qos.qos_profile_system_default
         )
 
-
-
+        # ---------- Subscriptions ----------
         self.create_subscription(
             Twist, '/quin/cmd_move', self.cmd_move, qos_profile=qos.qos_profile_system_default
         )
-
         self.create_subscription(
             Joy, '/quin/joy/spin', self.cmd_spin, qos_profile=qos.qos_profile_sensor_data
         )
-
         self.create_subscription(
             Joy, '/quin/joy/drill', self.cmd_drill, qos_profile=qos.qos_profile_sensor_data
         )
-
         self.create_subscription(
             Twist, "/quin/drill/feedback", self.drill_feedback, qos.qos_profile_sensor_data
         )
-
         self.create_subscription(
             Twist, '/quin/cmd_gripper', self.cmd_gripper, qos_profile=qos.qos_profile_system_default
         )
-
+        # CHANGED: route encoder data to cmd_encoder (handles in-band reset + distance)
         self.create_subscription(
-            Twist, "/quin/cmd_encoder", self.encoder, qos_profile=qos.qos_profile_sensor_data
+            Twist, "/quin/cmd_encoder", self.cmd_encoder, qos_profile=qos.qos_profile_sensor_data
         )
-
-        self.create_subscription(
-            Empty, "/quin/cmd_encoder/reset", self.cmd_encoder_reset, qos_profile=qos.qos_profile_system_default
-        )
-
 
         self.sent_data_timer = self.create_timer(0.01, self.sendData)
         
+        # keep drill press edge detector for pulse
+        self._prev_drill_pressed = False
 
     def get_pid(self,msg):
         self.controller.ConfigPIDF(kp = msg.data[0], ki= msg.data[1], kd=msg.data[2], kf=msg.data[3]) 
 
+    # (Kept for compatibility; not used by subscription anymore)
     def encoder(self,msg):
         self.encoder_mode = msg.linear.x    # 1 Bit, 2 RPM
 
-
     def cmd_move(self, msg):
-
         self.moveSpeed = msg.linear.y               # Forward/Backward
-        self.turnSpeed = msg.angular.z              # Rotation
-        self.turnSpeed = self.turnSpeed * 5 * (-1.0)   # Scale factor for angular velocity
+        self.turnSpeed = msg.angular.z * (-5.0)     # scale + invert if needed
 
         # Compute left and right wheel speeds (in m/s)
         left_speed = self.moveSpeed - (self.turnSpeed * self.wheel_base / 2.0)
         right_speed = self.moveSpeed + (self.turnSpeed * self.wheel_base / 2.0)
 
-        # Convert to motor speeds in RPM (optional)
+        # Map to motor speeds in RPM (example; tune to your system)
         rpm_left = float(left_speed * self.maxRPM)
         rpm_right = float(right_speed * self.maxRPM)
 
-        # Store or send these speeds to motor controller
         self.motor1Speed = rpm_left
         self.motor2Speed = rpm_right
 
-        print(f"Left Motor: {self.motor1Speed:.2f} RPM, Right Motor: {self.motor2Speed:.2f} RPM")
+    # CHANGED: unified encoder input + in-band reset
+    def cmd_encoder(self, msg: Twist):
+        """
+        Use /quin/cmd_encoder (Twist) to carry both:
+          - raw ticks in msg.linear.z (keeps running from motor node)
+          - mode in msg.linear.x (1=Bit, 2=RPM) [optional]
+          - one-shot reset flag in msg.angular.x (>=0.5 triggers reset)
 
+        We keep a local baseline (self._tick_zero) and publish
+        user-facing distance (cm) on /quin/debug/encoder.
+        """
+        # optional mode passthrough
+        self.encoder_mode = msg.linear.x
 
-    def cmd_encoder(self, msg):
+        # one-shot reset flag (sent by joystick)
+        reset_flag = float(msg.angular.x)
 
-        tick_per_revolution = 60
-        diameter = 85  # mm
-        circumference = math.pi * diameter  # mm
+        # geometry for conversion
+        tick_per_revolution = 60.0
+        diameter_mm = 85.0
+        circumference_mm = math.pi * diameter_mm
 
+        # raw ticks from motor node (monotonic)
         current_ticks = float(msg.linear.z)
 
+        # handle reset immediately: rebase baseline and publish 0.0
+        if reset_flag >= 0.5:
+            self._tick_zero = current_ticks
+            self._have_baseline = True
+            self.rack_distance = 0.0
+            self.pub_debug_encoder.publish(Float32(data=0.0))
+            return
+
+        # establish baseline on first sample
         if not self._have_baseline:
             self._tick_zero = current_ticks
             self._have_baseline = True
             self.rack_distance = 0.0
-            return      
+            self.pub_debug_encoder.publish(Float32(data=0.0))
+            return
 
-        self.rack_distance += mm_to_cm((msg.linear.z / tick_per_revolution) * circumference)
+        # compute distance from local zero
+        delta_ticks = current_ticks - self._tick_zero
+        mm = (delta_ticks / tick_per_revolution) * circumference_mm
+        self.rack_distance = mm_to_cm(mm)
 
+        # publish “check” value
+        self.pub_debug_encoder.publish(Float32(data=float(self.rack_distance)))
 
     def cmd_encoder_reset(self, msg):
-
-        # Zero any locally accumulated values/offsets
+        # NOTE: no longer used (we removed the separate reset topic)
         self.rack_distance = 0.0
         self._have_baseline = False
-
-        # If you keep any PID integrators or filters, clear them here too
-        # e.g., self.controller.reset()  (if you use one)
-
         self.get_logger().info("Encoder/local odometry reset")
-    
 
-    def cmd_spin(self, msg):
-        
+    def cmd_spin(self, msg: Joy):
         circle = (len(msg.buttons) > self.BTN_CIRCLE and msg.buttons[self.BTN_CIRCLE] == 1)
         square = (len(msg.buttons) > self.BTN_SQUARE and msg.buttons[self.BTN_SQUARE] == 1)
 
         if circle and not square :       # Circle
-            self.motorspin1Speed = 1.0          # Clockwise       
-        
+            self.motorspin1Speed = 1.0          # CW       
         elif square and not circle :     # Square
-            self.motorspin1Speed = -1.0         # Counter-Clockwise
-
+            self.motorspin1Speed = -1.0         # CCW
         else:
             self.motorspin1Speed = 0.0          # Stop
 
-
-    def cmd_drill(self, msg):
-
+    def cmd_drill(self, msg: Joy):
+        # Keep behavior: short pulse on L1 rising edge (~50 ms)
         l1 = (len(msg.buttons) > self.BTN_L1 and msg.buttons[self.BTN_L1] == 1)
-
-        # Edge-detect without editing __init__
-        if not hasattr(self, "_prev_drill_pressed"):
-            self._prev_drill_pressed = False
-
         if l1 and not self._prev_drill_pressed:
-            # Emit a short pulse: 1.0 then auto-reset to 0.0
             self.motordrillSpeed = 1.0
             threading.Timer(0.05, lambda: setattr(self, "motordrillSpeed", 0.0)).start()
-
-            # --- ADDED: count 1 plant on the 'UP' press (every second press) ---
-            # move_down_next True  => this press commands DOWN (start of cycle)
-            # move_down_next False => this press commands UP   (end of cycle) -> count +1
-            if not self.move_down_next:
-                self.plant_count += 1
-                self.send_plant_count.publish(Int32(data=self.plant_count))
-
-            # flip expected direction for next press
-            self.move_down_next = not self.move_down_next
-
         self._prev_drill_pressed = l1
-        
 
     def cmd_gripper(self, msg):
-        if msg.linear.x == 1:               # Closed Servo
+        if msg.linear.x == 0:               # Closed Servo
             self.servo_angle = float(0.0)
-
-        if msg.linear.x == 2:               # Opened Servo
+        if msg.linear.x == 1:               # Opened Servo
             self.servo_angle = float(60.0)
 
+    def drill_feedback(self, msg: Twist):
+        # unchanged placeholder
+        pass
 
     def sendData(self):
-
         motorspeed_msg = Twist()
         motorspeed_msg.linear.x = float(self.motor1Speed)
         motorspeed_msg.linear.y = float(self.motor2Speed)

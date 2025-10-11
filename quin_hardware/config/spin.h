@@ -16,7 +16,7 @@ const float TWIST_DEADZONE = 0.05f;
 #define STEPS_PER_36   ((int)round(STEPS_PER_REV / 10.0f))      // 3200/10 = 320
 
 #define STEP_PULSE_HIGH_US  4      // กว้างพัลส์ STEP (3–5us ทั่วไป)
-#define STEP_PERIOD_US      120   // adjust speed here (lower = faster)
+#define STEP_PERIOD_US      5000   // adjust speed here (lower = faster)
 
 // 28BYJ-48: ~2048 steps per 360° (depends on library/gearbox)
 // #define STEPS_PER_REV 200

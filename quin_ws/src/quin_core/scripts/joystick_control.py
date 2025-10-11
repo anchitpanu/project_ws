@@ -107,9 +107,9 @@ class Gamepad:
 
     def update_encoder_reset(self):
         if self.button_triangle and not self.previous_triangle_state:
-            self.encoderReset = True
-        else:
-            self.encoderReset = False
+            self.encoder_reset = True
+        # else:
+        #     self.encoder_reset = False
         self.previous_triangle_state = self.button_triangle
 
     def update_toggle_encoder(self):
@@ -152,7 +152,7 @@ class Joystick(Node):
         )
 
         self.pub_encoder_reset = self.create_publisher(
-            Twist, "/quin/cmd_encoder/reset", qos_profile=qos.qos_profile_system_default
+            Empty, "/quin/cmd_encoder/reset", qos_profile=qos.qos_profile_system_default
         )
 
 
@@ -199,70 +199,55 @@ class Joystick(Node):
         
         #Macro-----------------------------------------------------------
         
-        # self.gamepad.update_drill()
-        # self.gamepad.update_gripper()
+        self.gamepad.update_gripper()
         self.gamepad.update_toggle_encoder()
+        self.gamepad.update_encoder_reset()   # Triangle rising edge
 
-        # press=1 release=0
+        # Hold-style mappings
         self.gamepad.spin     = bool(self.gamepad.button_circle) 
         self.gamepad.spinback = bool(self.gamepad.button_square)   
         self.gamepad.drill    = bool(self.gamepad.l1)
-        self.gamepad.gripper  = bool(self.gamepad.r1)
-        self.gamepad.encoderReset = bool(self.gamepad.button_triangle) 
-    
 
         if self.gamepad.button_logo:
             self.gamepad.reset_toggles()
 
-
-
     def sendData(self):
-        
+        # Move
         cmd_vel_move = Twist()
-        cmd_encoder = Twist()
-
         cmd_vel_move.linear.x = float(self.gamepad.ly * self.maxspeed)
         cmd_vel_move.angular.z = float(self.gamepad.rx * self.maxspeed)
+        self.pub_move.publish(cmd_vel_move)
 
-
-        # spin command: -1/0/+1 on angular.z
+        # Spin
         cmd_spin = Twist()
-
         if self.gamepad.spin and not self.gamepad.spinback:
-            cmd_spin.angular.z = +1.0         # Circle: clockwise
-
+            cmd_spin.angular.z = +1.0
         elif self.gamepad.spinback and not self.gamepad.spin:
-            cmd_spin.angular.z = -1.0         # Square: counter-clockwise
-
+            cmd_spin.angular.z = -1.0
         else:
-            cmd_spin.angular.z = 0.0          # Stop
+            cmd_spin.angular.z = 0.0
         self.pub_spin.publish(cmd_spin)
 
-
-        # drill command: -1/0/+1 on linear.z
+        # Drill
         cmd_drill = Twist()
-
-        if self.gamepad.drill:
-            cmd_drill.linear.z = +1.0         # l1: drill down
-        else:
-            cmd_drill.linear.z = 0.0          # Stop
+        cmd_drill.linear.z = +1.0 if self.gamepad.drill else 0.0
         self.pub_drill.publish(cmd_drill)
         
-
-        if self.gamepad.encoder_reset:
-            self.pub_encoder_reset.publish(Empty())
-            self.gamepad.encoder_reset = False
-
-
-        if self.gamepad.toggle_encoder_bool:
-            cmd_encoder.linear.x = 2.0 #RPM
-        else:
-            cmd_encoder.linear.x = 1.0 #Bit
-        
-
-        self.pub_encoder.publish(cmd_encoder)
-        self.pub_move.publish(cmd_vel_move)
+        # Gripper
+        cmd_gripper = Twist()
+        cmd_gripper.linear.x = +1.0 if self.gamepad.gripper else 0.0
         self.pub_gripper.publish(cmd_gripper)
+
+        # Encoder command + in-band reset flag (no separate reset topic)
+        cmd_encoder = Twist()
+        cmd_encoder.linear.x = 2.0 if self.gamepad.toggle_encoder_bool else 1.0  # mode
+        if self.gamepad.encoder_reset:
+            cmd_encoder.angular.x = 1.0   # one-shot reset
+            self.gamepad.encoder_reset = False
+        else:
+            cmd_encoder.angular.x = 0.0
+        # NOTE: raw ticks should be filled upstream by the motor/encoder node
+        self.pub_encoder.publish(cmd_encoder)
 
 
 def main():

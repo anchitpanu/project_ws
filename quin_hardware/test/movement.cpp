@@ -268,10 +268,10 @@ void Move()
     float wheel_right = Vx + (Wz * LR_WHEELS_DISTANCE * 0.5f);
 
     // m/s to rpm
-    float wheel1_rpm = (wheel_left / (0.2 * M_PI * WHEEL_RADIUS)) * 60.0f; // front left
-    float wheel2_rpm = (wheel_right / (0.2 * M_PI * WHEEL_RADIUS)) * 60.0f; // front right
-    float wheel3_rpm = (wheel_left / (0.2 * M_PI * WHEEL_RADIUS)) * 60.0f; // rear left
-    float wheel4_rpm = (wheel_right / (0.2 * M_PI * WHEEL_RADIUS)) * 60.0f; // rear right
+    float wheel1_rpm = (wheel_left / (2.0 * M_PI * WHEEL_RADIUS)) * 60.0f; // front left
+    float wheel2_rpm = (wheel_right / (2.0 * M_PI * WHEEL_RADIUS)) * 60.0f; // front right
+    float wheel3_rpm = (wheel_left / (2.0 * M_PI * WHEEL_RADIUS)) * 60.0f; // rear left
+    float wheel4_rpm = (wheel_right / (2.0 * M_PI * WHEEL_RADIUS)) * 60.0f; // rear right
 
     // Clamp RPM to max allowed
     float max_rpm_allowed = MOTOR_MAX_RPM * MAX_RPM_RATIO;

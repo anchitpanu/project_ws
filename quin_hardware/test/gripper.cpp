@@ -69,8 +69,10 @@ void Gripper();
 
 void setup()
 {
-  myServo.attach(9);   // attach servo signal pin to D9
   Serial.begin(115200);
+  set_microros_serial_transports(Serial); 
+
+  myServo.attach(SERVO_PIN, 500, 2500);
 
   // Start in closed position
   myServo.write(SERVO_CLOSED);
@@ -175,12 +177,12 @@ bool destroyEntities()      // destroy ROS entities
 
 void Gripper()
 {
-    if (gripper_msg.linear.x == 2) {
+    if (gripper_msg.linear.x == 1) {
         myServo.write(SERVO_OPENED);
-        gripper_msg.linear.x = 2.0;  // indicate opened
-    } else if (gripper_msg.linear.x == 1) {
+        gripper_msg.linear.x = 1.0;  // indicate opened
+    } else if (gripper_msg.linear.x == 0) {
         myServo.write(SERVO_CLOSED);
-        gripper_msg.linear.x = 1.0;  // indicate closed
+        gripper_msg.linear.x = 0.0;  // indicate closed
     }
 
     debug_gripper_msg.linear.x = gripper_msg.linear.x;

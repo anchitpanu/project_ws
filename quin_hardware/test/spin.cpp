@@ -51,6 +51,10 @@ enum states
 } state;
 
 
+// --- Debounce config (ADD) ---
+const unsigned long SPIN_DEBOUNCE_MS = 250;   // time between allowed triggers
+static unsigned long last_spin_event_ms = 0;  // timestamp of last trigger
+
 Stepper myStepper(STEPS_PER_REV, SPIN_STEP_PIN_PLS, SPIN_STEP_PIN_DIR);
 
 // Movement queue: remaining steps to execute (positive or negative)
@@ -78,6 +82,11 @@ void setup()
     // put your setup code here, to run once:
     Serial.begin(115200);
     set_microros_serial_transports(Serial);     // connect between esp32 and micro-ros agent
+
+    pinMode(SPIN_STEP_PIN_PLS, OUTPUT);
+    pinMode(SPIN_STEP_PIN_DIR, OUTPUT);
+    digitalWrite(SPIN_STEP_PIN_PLS, LOW);
+    digitalWrite(SPIN_STEP_PIN_DIR, LOW);
 
     // Stepper pins
     // pinMode(STEPPER_PIN_EN, OUTPUT);
@@ -216,6 +225,7 @@ void Spin()
 
     debug_spin_msg.angular.z = spin_msg.angular.z;
 }
+
 
 void publishData()
 {

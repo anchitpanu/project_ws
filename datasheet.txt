@@ -3,4 +3,27 @@ khi's joy : 5D:B2:2E:D1:2E:D9
 quin's pi-ip: 10.50.232.237
 
 monitor camera: ros2 run web_video_server web_video_server
-web: http://10.50.232.237:8080/stream?topic=/quin/image_raw
+web: http://10.135.138.237:8080/stream?topic=/quin/image_raw
+
+Dashboard:
+- on pi
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml   # WS :9090
+ros2 run web_video_server web_video_server                    # MJPEG :8080
+
+- on pc
+npm run dev -- -H 0.0.0.0 -p 3000
+
+
+- on web
+http://<IP-address>:3000
+http://localhost:3000
+
+ws://<IP-quin>:9090
+http://<IP-quin>:8080/stream?topic=/quin/image_raw
+
+camera
+ATTRS{serial}=="01.00.00"
+
+HD: v4l2-ctl -d /dev/video0 --set-ctrl=focus_absolute=325
+
+
