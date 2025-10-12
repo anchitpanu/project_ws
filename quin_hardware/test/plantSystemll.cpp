@@ -141,7 +141,7 @@ void setup() {
   spinStepper.setSpeed(STEPPER_RPM);
   drillStepper.setSpeed(STEPPER_RPM);
 
-  myServo.attach(19);
+  myServo.attach(13);
   myServo.write(SERVO_CLOSED);
 }
 

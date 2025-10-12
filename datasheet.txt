@@ -3,6 +3,7 @@ khi's joy : 5D:B2:2E:D1:2E:D9
 quin's pi-ip: 10.50.232.237
 
 monitor camera: ros2 run web_video_server web_video_server
+<<<<<<< HEAD
 web: http://10.135.138.237:8080/stream?topic=/quin/image_raw
 
 Dashboard:
@@ -27,3 +28,6 @@ ATTRS{serial}=="01.00.00"
 HD: v4l2-ctl -d /dev/video0 --set-ctrl=focus_absolute=325
 
 
+=======
+web: dcxv c c
+>>>>>>> 868a21c (system)

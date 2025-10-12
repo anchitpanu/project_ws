@@ -203,6 +203,10 @@ class Cmd_vel_to_motor_speed(Node):
     def cmd_gripper(self, msg):
         if msg.linear.x == 0:               # Closed Servo
             self.servo_angle = float(0.0)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 868a21c (system)
         if msg.linear.x == 1:               # Opened Servo
             self.servo_angle = float(60.0)
 

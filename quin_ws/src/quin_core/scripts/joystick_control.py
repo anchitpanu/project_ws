@@ -2,7 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String, Int16MultiArray , Float32MultiArray
+from std_msgs.msg import String, Int16MultiArray , Float32MultiArray, Empty
 from geometry_msgs.msg import Twist 
 from sensor_msgs.msg import Joy
 from rclpy import qos
@@ -199,6 +199,10 @@ class Joystick(Node):
         
         #Macro-----------------------------------------------------------
         
+<<<<<<< HEAD
+=======
+        # self.gamepad.update_drill()
+>>>>>>> 868a21c (system)
         self.gamepad.update_gripper()
         self.gamepad.update_toggle_encoder()
         self.gamepad.update_encoder_reset()   # Triangle rising edge
@@ -207,7 +211,14 @@ class Joystick(Node):
         self.gamepad.spin     = bool(self.gamepad.button_circle) 
         self.gamepad.spinback = bool(self.gamepad.button_square)   
         self.gamepad.drill    = bool(self.gamepad.l1)
+<<<<<<< HEAD
 
+=======
+        # self.gamepad.gripper  = bool(self.gamepad.r1)
+        self.gamepad.encoderReset = bool(self.gamepad.button_triangle)
+        
+    
+>>>>>>> 868a21c (system)
         if self.gamepad.button_logo:
             self.gamepad.reset_toggles()
 
@@ -233,9 +244,39 @@ class Joystick(Node):
         cmd_drill.linear.z = +1.0 if self.gamepad.drill else 0.0
         self.pub_drill.publish(cmd_drill)
         
+<<<<<<< HEAD
         # Gripper
         cmd_gripper = Twist()
         cmd_gripper.linear.x = +1.0 if self.gamepad.gripper else 0.0
+=======
+
+        cmd_gripper = Twist()
+
+        if self.gamepad.gripper:
+            cmd_gripper.linear.x = +1.0         # r1: gripper open
+        else:
+            cmd_gripper.linear.x = 0.0          # Stop
+        self.pub_gripper.publish(cmd_gripper)
+
+
+        if getattr(self.gamepad, "encoder_reset", False):
+            self.pub_encoder_reset.publish(Empty())
+            self.gamepad.encoder_reset = False 
+
+        # if self.gamepad.encoder_reset:
+        #     self.pub_encoder_reset.publish(Empty())
+        #     self.gamepad.encoder_reset = False
+
+
+        if self.gamepad.toggle_encoder_bool:
+            cmd_encoder.linear.x = 2.0 #RPM
+        else:
+            cmd_encoder.linear.x = 1.0 #Bit
+        
+
+        self.pub_encoder.publish(cmd_encoder)
+        self.pub_move.publish(cmd_vel_move)
+>>>>>>> 868a21c (system)
         self.pub_gripper.publish(cmd_gripper)
 
         # Encoder command + in-band reset flag (no separate reset topic)
